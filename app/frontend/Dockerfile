@@ -4,6 +4,6 @@ WORKDIR /app-frontend
 EXPOSE 3000
 
 COPY ./ .
-RUN npm i
-RUN npm run build
+RUN npm i && npm run build
+
 CMD [ "npm", "start" ]

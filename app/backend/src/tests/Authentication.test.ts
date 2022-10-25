@@ -1,4 +1,6 @@
-// import * as sinon from 'sinon';
+import { Model } from 'sequelize';
+import { UserAttributes, UserCreationAttributes } from './../database/models/types/User';
+import * as sinon from 'sinon';
 import * as chai from 'chai';
 // @ts-ignore
 import chaiHttp = require('chai-http');
@@ -7,6 +9,7 @@ import { app } from '../app';
 import User from '../database/models/User';
 
 import { Response } from 'superagent';
+import { IUser } from '../auth/interfaces';
 
 chai.use(chaiHttp);
 
@@ -14,12 +17,28 @@ const { expect } = chai;
 
 describe('Post /login services:', () => {
   describe('Good request received:', () => {
-    it('1.1 Should return a token', () => {
+    const user = { id: 1, username: 'Sócrates', email: 'socrates@corintia.com', password: '123456' }
+    before(() => {
+      sinon.stub(Model, 'findOne').resolves(null)
+      sinon.stub(Model, 'create').resolves(user as User)
+    })
+    after(() => sinon.restore())
+    it('deve retornar um status 200', async () => {
+      const httpResponse = await chai
+        .request(app)
+        .post('/login')
+        .send({ email: 'socrates@corintia.com',password: '123456' });
 
-    });
-    it('1.2 Should be redirected to Games View', () => {
+      expect(httpResponse.status).to.equal(200);
+      // expect(httpResponse.body).to.have.all.keys(['token']);
+      // expect(httpResponse.body).to.deep.equal(userWithoutPass);
+    })
+    // it('1.1 Should return a token', () => {
 
-    });
+    // });
+    // it('1.2 Should be redirected to Games View', () => {
+
+    // });
   })
   /**
    * Exemplo do uso de stubs com tipos
@@ -46,8 +65,4 @@ describe('Post /login services:', () => {
 
   //   expect(...)
   // });
-
-  it('Seu sub-teste', () => {
-    expect(false).to.be.eq(true);
-  });
 });

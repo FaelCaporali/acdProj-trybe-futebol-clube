@@ -3,7 +3,8 @@ WORKDIR /app-frontend
 
 EXPOSE 3000
 
+COPY ["./package.json", "./package-lock.json", "./"]
+RUN npm i
 COPY ./ .
-RUN npm i && npm run build
 
 CMD [ "npm", "start" ]

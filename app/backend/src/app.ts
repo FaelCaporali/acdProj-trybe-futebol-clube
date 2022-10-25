@@ -27,11 +27,11 @@ class App {
 
     this.app.use(cors());
     this.app.use(helmet());
+    // Para evitar conflitos de headers, a configuração inicial do projeto é mantida abaixo para sobrescrever o cors e helmet;
+    this.app.use(accessControl);
 
     this.app.use('/login', auth);
 
-    // Para evitar conflitos de headers, a configuração inicial do projeto é mantida abaixo para sobrescrever o cors e helmet;
-    this.app.use(accessControl);
 
     // this.app.use(errorMiddleware);
   }

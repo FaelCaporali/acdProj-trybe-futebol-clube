@@ -26,7 +26,7 @@ services:
       - ./backend/src:/app-backend/src
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_completed_successfully
     environment:
       - APP_PORT=3001
       - JWT_SECRET=jwt_secret

@@ -1,10 +1,10 @@
-import * as sinon from 'sinon';
+// import * as sinon from 'sinon';
 import * as chai from 'chai';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import Example from '../database/models/ExampleModel';
+import User from '../database/models/User';
 
 import { Response } from 'superagent';
 
@@ -12,7 +12,15 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('Seu teste', () => {
+describe('Post /login services:', () => {
+  describe('Good request received:', () => {
+    it('1.1 Should return a token', () => {
+
+    });
+    it('1.2 Should be redirected to Games View', () => {
+
+    });
+  })
   /**
    * Exemplo do uso de stubs com tipos
    */

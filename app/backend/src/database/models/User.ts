@@ -4,10 +4,10 @@ import db from '.';
 // import OtherModel from './OtherModel';
 
 class User extends Model<UserAttributes, UserCreationAttributes> {
-  declare id?: number;
+  declare readonly id?: number;
   declare email: string;
   declare username: string;
-  declare password: string;
+  declare password?: string;
 }
 
 User.init({

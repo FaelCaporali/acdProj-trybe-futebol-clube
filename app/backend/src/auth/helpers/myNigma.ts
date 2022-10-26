@@ -15,6 +15,7 @@ export default class MyNygma implements INygma {
   private cipher: crypto.Cipher;
   private decipher: crypto.Cipher;
   private userHashed: string | boolean;
+  private dHashUsed: boolean;
 
   constructor(private readonly jwtSecret: string) {
     this.jwtSecret = jwtSecret;
@@ -53,16 +54,21 @@ export default class MyNygma implements INygma {
     const string = JSON.stringify(user);
     this.userHashed = this.cipher.update(string, 'utf8', 'hex');
     this.userHashed += this.cipher.final('hex');
+    this.iv = crypto.randomBytes(16);
+    this.key = crypto.randomBytes(32);
+    this.cipher = crypto.createCipheriv(ALGORITHM, this.key, this.iv);
+    if (!this.dHashUsed) {
+      this.decipher = crypto.createDecipheriv(ALGORITHM, this.key, this.iv);
+    }
+    this.dHashUsed = false;
     return this.userHashed;
   }
 
   private deHashUser(hash: string): IUser {
+    this.dHashUsed = true;
     const user = this.decipher.update(hash, 'hex', 'utf8');
     const deHUser = JSON.parse(user);
     this.userHashed = false;
-    this.iv = crypto.randomBytes(16);
-    this.key = crypto.randomBytes(32);
-    this.cipher = crypto.createCipheriv(ALGORITHM, this.key, this.iv);
     this.decipher = crypto.createDecipheriv(ALGORITHM, this.key, this.iv);
     return deHUser;
   }

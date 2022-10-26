@@ -13,15 +13,21 @@ export interface ILogRequest {
 }
 
 export interface INewUser extends PublicInfo {
-  passwords: string;
+  password: string;
 }
 
 export interface IUser extends PublicInfo {
   id: number;
+  role: string;
+}
+export interface IFullUser extends INewUser {
+  id: number;
+  role: string;
 }
 
 export interface IAuthServices {
-  validate(token: IToken): IRole;
-  login(user: ILogRequest): IToken;
-  logout(id: number): void;
+  register(user: INewUser): Promise<IUser>;
+  validate(token: IToken): Promise<IRole>;
+  login(user: ILogRequest): Promise<IToken>;
+  logout(id: number): Promise<void>;
 }

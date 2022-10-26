@@ -10,6 +10,7 @@ class App {
     this.app = express();
 
     this.config();
+    this.authRouter();
 
     // Não remover essa rota
     this.app.get('/', (req, res) => res.json({ ok: true }));
@@ -27,13 +28,14 @@ class App {
 
     this.app.use(cors());
     this.app.use(helmet());
+
     // Para evitar conflitos de headers, a configuração inicial do projeto é mantida abaixo para sobrescrever o cors e helmet;
     this.app.use(accessControl);
-
-    this.app.use('/login', auth);
-
-
     // this.app.use(errorMiddleware);
+  }
+
+  private authRouter() {
+    this.app.use('/login', auth);
   }
 
   public start(PORT: string | number):void {

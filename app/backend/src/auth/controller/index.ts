@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
-import AuthServices from '../service';
+import { IAuthServices } from '../interfaces';
 
 export default class AuthCtl {
-  constructor(private service: AuthServices) { }
+  constructor(private readonly services: IAuthServices) {
+    this.services = services;
+  }
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  public async login(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const { email, password } = req.body;
-      const token = this.service.login({ email, password });
+      const token = await this.services.login({ email, password });
       return res.status(200).json(token);
     } catch (e) {
       next(e);

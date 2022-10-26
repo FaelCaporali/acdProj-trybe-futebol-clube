@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import AuthCtl from '../controller';
-import AuthService from '../service';
-import User from '../../database/models/User';
+import AuthCtl from '../controller/index';
+import AuthServices from '../service';
 
 const auth = Router();
-const authCtl = new AuthCtl(new AuthService(User));
+const authService = new AuthServices();
+const authCtl = new AuthCtl(authService);
 
-auth.post('/', authCtl.login);
+auth.post('/', (req, res, next) => authCtl.login(req, res, next));
 
 export default auth;

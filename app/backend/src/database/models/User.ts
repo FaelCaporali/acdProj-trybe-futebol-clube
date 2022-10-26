@@ -8,6 +8,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
   declare email: string;
   declare username: string;
   declare password?: string;
+  declare role: string;
 }
 
 User.init({
@@ -29,6 +30,9 @@ User.init({
     type: STRING(255),
     unique: true,
     allowNull: false,
+  },
+  role: {
+    type: STRING(255),
   },
 }, {
   // ... Outras configs

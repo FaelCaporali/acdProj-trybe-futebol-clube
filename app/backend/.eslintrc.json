@@ -17,7 +17,6 @@
     "ecmaVersion": 2019,
     "sourceType": "module",
     "project": "./tsconfig.json"
-    // "project": "./03-backend/sd-021-a-trybe-futebol-clube/app/backend/tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint",

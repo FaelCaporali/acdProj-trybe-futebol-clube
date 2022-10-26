@@ -1,39 +1,93 @@
-import * as bcrypt from 'bcryptjs';
 import * as Jwt from 'jsonwebtoken';
-import { IToken, IUser } from '../interfaces';
+import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
+import { IToken, IUser, IRole } from '../interfaces';
 import { INygma } from '../interfaces/Nygma';
+
+const ALGORITHM = 'aes-256-gcm';
 
 export default class MyNygma implements INygma {
   private readonly salt: string;
   private readonly jwt: typeof Jwt;
-  private readonly crypto: typeof bcrypt;
+  private readonly bcrypt: typeof bcrypt;
+  private iv: Buffer;
+  private key: Buffer;
+  private cipher: crypto.Cipher;
+  private decipher: crypto.Cipher;
+  private userHashed: string | boolean;
 
   constructor(private readonly jwtSecret: string) {
     this.jwtSecret = jwtSecret;
-    this.crypto = bcrypt;
-    this.salt = this.crypto.genSaltSync(10);
     this.jwt = Jwt;
+    this.bcrypt = bcrypt;
+    this.salt = this.bcrypt.genSaltSync(15);
+    this.iv = crypto.randomBytes(16);
+    this.key = crypto.randomBytes(32);
+    this.cipher = crypto.createCipheriv(ALGORITHM, this.key, this.iv);
+    this.decipher = crypto.createDecipheriv(ALGORITHM, this.key, this.iv);
+    this.userHashed = false;
   }
 
   hashPassword(password: string): string {
-    return this.crypto.hashSync(password);
+    return this.bcrypt.hashSync(password, this.salt);
   }
 
   compareHash(password: string, hash: string): boolean {
-    return this.crypto.compareSync(password, hash);
+    return this.bcrypt.compareSync(password, hash);
   }
 
   generateToken(user: IUser): IToken {
-    const token = this.jwt.sign(
-      { user },
-      this.jwtSecret,
-      { expiresIn: '0.25h' },
-    );
+    const token = this.jwt.sign({ payload: this.hashUser(user) }, this.jwtSecret, {
+      expiresIn: '1h',
+    });
     return { token };
   }
 
-  validateToken({ token }: IToken): { role: 'admin' | 'user' } | void {
-    const { user: { role } } = this.jwt.verify(token, this.jwtSecret) as Jwt.JwtPayload;
-    return { role };
+  validateToken({ token }: IToken): IRole | void {
+    const { payload } = this.jwt.verify(token, this.jwtSecret) as { payload: string };
+    const { role } = this.deHashUser(payload) as IUser;
+    return { role } as IRole;
+  }
+
+  private hashUser(user: IUser): string {
+    const string = JSON.stringify(user);
+    this.userHashed = this.cipher.update(string, 'utf8', 'hex');
+    this.userHashed += this.cipher.final('hex');
+    return this.userHashed;
+  }
+
+  private deHashUser(hash: string): IUser {
+    const user = this.decipher.update(hash, 'hex', 'utf8');
+    const deHUser = JSON.parse(user);
+    this.userHashed = false;
+    this.iv = crypto.randomBytes(16);
+    this.key = crypto.randomBytes(32);
+    this.cipher = crypto.createCipheriv(ALGORITHM, this.key, this.iv);
+    this.decipher = crypto.createDecipheriv(ALGORITHM, this.key, this.iv);
+    return deHUser;
   }
 }
+
+// const myAdmin = {
+//   id: 10,
+//   email: 'asdasdasdasdasdasdasdasdasdasdasd@admin.com',
+//   role: 'admin',
+//   username: 'asdasdASSDSDSDSDdsdsdDOPKIHJOSIUGLBUIBliyugbvliyviylvuyuyvasdasda',
+// };
+// const user2 = {
+//   id: 2,
+//   email: 'outro@admin.com',
+//   role: 'admin',
+//   username: 'admin2',
+// };
+// const newNygma = new MyNygma('teste');
+
+// const hu1 = newNygma.generateToken(myAdmin);
+// const du1 = newNygma.validateToken(hu1);
+// const hu2 = newNygma.generateToken(user2);
+// const du2 = newNygma.validateToken(hu2);
+
+// console.log(hu1);
+// console.log(du1);
+// console.log(hu2);
+// console.log(typeof du2);

@@ -38,7 +38,7 @@ export default class MyNygma implements INygma {
 
   generateToken(user: IUser): IToken {
     const token = this.jwt.sign({ payload: this.hashUser(user) }, this.jwtSecret, {
-      expiresIn: '1h',
+      expiresIn: '15m',
     });
     return { token };
   }
@@ -67,27 +67,3 @@ export default class MyNygma implements INygma {
     return deHUser;
   }
 }
-
-// const myAdmin = {
-//   id: 10,
-//   email: 'asdasdasdasdasdasdasdasdasdasdasd@admin.com',
-//   role: 'admin',
-//   username: 'asdasdASSDSDSDSDdsdsdDOPKIHJOSIUGLBUIBliyugbvliyviylvuyuyvasdasda',
-// };
-// const user2 = {
-//   id: 2,
-//   email: 'outro@admin.com',
-//   role: 'admin',
-//   username: 'admin2',
-// };
-// const newNygma = new MyNygma('teste');
-
-// const hu1 = newNygma.generateToken(myAdmin);
-// const du1 = newNygma.validateToken(hu1);
-// const hu2 = newNygma.generateToken(user2);
-// const du2 = newNygma.validateToken(hu2);
-
-// console.log(hu1);
-// console.log(du1);
-// console.log(hu2);
-// console.log(typeof du2);

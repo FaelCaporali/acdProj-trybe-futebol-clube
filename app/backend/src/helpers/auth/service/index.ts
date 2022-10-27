@@ -9,7 +9,7 @@ import {
   IUser,
   IFullUser,
 } from '../interfaces';
-import MyNygma from '../helpers/myNigma';
+import MyNygma from '../../myNygma';
 import schema from './validations/schemas';
 import 'dotenv/config';
 

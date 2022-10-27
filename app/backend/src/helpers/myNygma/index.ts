@@ -1,9 +1,9 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
-import HttpException from '../../error/HttpException';
-import { INygma } from '../interfaces/Nygma';
-import { IToken, IUser, IRole } from '../interfaces';
+import HttpException from '../error/HttpException';
+import { INygma } from '../auth/interfaces/Nygma';
+import { IToken, IUser, IRole } from '../auth/interfaces';
 
 const ALGORITHM = 'aes-128-gcm';
 

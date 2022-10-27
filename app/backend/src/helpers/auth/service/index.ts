@@ -1,4 +1,5 @@
-import User from '../../database/models/User';
+import HttpException from '../../error/HttpException';
+import User from '../../../database/models/User';
 import {
   IToken,
   ILogRequest,
@@ -9,40 +10,42 @@ import {
   IFullUser,
 } from '../interfaces';
 import MyNygma from '../helpers/myNigma';
+import schema from './validations/schemas';
 import 'dotenv/config';
 
 export default class AuthServices implements IAuthServices {
   private readonly model: typeof User;
   private readonly nygma: MyNygma;
+  private readonly schemas: typeof schema;
 
   constructor() {
     this.model = User;
     this.nygma = new MyNygma(
       process.env.JWT_SECRET || 'Should have a better secret',
     );
+    this.schemas = schema;
   }
 
   async register(user: INewUser): Promise<IUser> {
     const newUser = await this.model.create(user);
     return newUser as IUser;
-    // throw new Error('Method not implemented.');
   }
 
-  public async validate(_token: IToken): Promise<IRole> {
-    const user = await this.model.findByPk(1);
-    console.log(user);
-    throw new Error('Method not implemented.');
+  public async validate(token: IToken): Promise<IRole> {
+    return this.nygma.validateToken(token);
   }
 
-  public async login({ email, password }: ILogRequest): Promise<IToken> {
+  public async login(credentials: ILogRequest): Promise<IToken> {
+    const { error } = this.schemas.validate(credentials);
+    if (error) throw new HttpException(401, 'Incorrect email or password');
+
+    const { email, password } = credentials;
     const validUser = (await this.model.findOne({
       where: { email },
     })) as IFullUser;
-
-    if (validUser === null) { throw new Error('should create an error handler - email not in db'); }
-
-    if (!this.nygma.compareHash(password, validUser.password)) {
-      throw new Error('should create an error handler - wrong password');
+    if (validUser === null
+      || !this.nygma.compareHash(password, validUser.password)) {
+      throw new HttpException(401, 'Incorrect email or password');
     }
 
     return this.nygma.generateToken(validUser as IUser);

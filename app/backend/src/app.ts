@@ -1,7 +1,8 @@
 import * as express from 'express';
 import * as cors from 'cors';
 import helmet from 'helmet';
-import auth from './auth/routes';
+import auth from './helpers/auth/routes';
+import httpErrorMiddleware from './helpers/error/middleware';
 
 class App {
   public app: express.Express;
@@ -28,14 +29,13 @@ class App {
 
     this.app.use(cors());
     this.app.use(helmet());
-
     // Para evitar conflitos de headers, a configuração inicial do projeto é mantida abaixo para sobrescrever o cors e helmet;
     this.app.use(accessControl);
-    // this.app.use(errorMiddleware);
   }
 
   private authRouter() {
     this.app.use('/login', auth);
+    this.app.use(httpErrorMiddleware);
   }
 
   public start(PORT: string | number):void {

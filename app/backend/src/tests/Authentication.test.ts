@@ -6,14 +6,14 @@ import { Model } from 'sequelize';
 
 import { app } from '../app';
 import User from '../database/models/User';
-
-import { IRole } from '../auth/interfaces';
+import { before } from 'mocha';
 
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
 describe('/login services:', () => {
+  
   describe('1.1. (POST)/login - good request received:', () => {
   
     const user = { id: 1, username: 'admin', email: 'admin@admin.com', password: '$2a$08$xi.Hxk1czAO0nZR..B393u10aED0RQ1N3PAEXQ7HxtLjKPEZBu.PW' }
@@ -68,15 +68,15 @@ describe('/login services:', () => {
         .post('/login')
         .send({ email: 'admin', password: 'secret_admin' });
 
-      expect(httpResponse.status).to.equal(400);
-      expect(httpResponse.body.message).to.deep.equal('All fields must be filled');
+      expect(httpResponse.status).to.equal(401);
+      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
     });
 
     it('1.2.3. Should require password field on the request body', async () => {
       const httpResponse = await chai
         .request(app)
         .post('/login')
-        .send({ email: 'admion@admin.com' });
+        .send({ email: 'admin@admin.com' });
 
       expect(httpResponse.status).to.equal(400);
       expect(httpResponse.body.message).to.deep.equal('All fields must be filled');
@@ -88,8 +88,28 @@ describe('/login services:', () => {
         .post('/login')
         .send({ email: 'admin@admin.com', password: 'asd' });
 
-      expect(httpResponse.status).to.equal(400);
-      expect(httpResponse.body.message).to.deep.equal('All fields must be filled');
+      expect(httpResponse.status).to.equal(401);
+      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
+    });
+
+    it('1.2.5. Should deny access to unregistered user', async () => {
+      const httpResponse = await chai
+        .request(app)
+        .post('/login')
+        .send({ email: 'socrates@admin.com', password: 'asd' });
+
+      expect(httpResponse.status).to.equal(401);
+      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
+    });
+
+    it('1.2.6. Should deny access if an incorrect password is provided', async () => {
+      const httpResponse = await chai
+        .request(app)
+        .post('/login')
+        .send({ email: 'admin@admin.com', password: 'my_secret_admin' });
+
+      expect(httpResponse.status).to.equal(401);
+      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
     });
   });
 
@@ -110,12 +130,12 @@ describe('/login services:', () => {
       expect(httpResponse.body.role).to.equal('admin');
     });
 
-    it('1.3.2. Should return a status 404 and "Invalid token" as a message value, in body response, if token is invalid or not provided',
+    it('1.3.2. Should return a status 401 and "Invalid token" as a message value, in body response, if token is invalid or not provided',
     // set a optional body key in user -> {"expires":"time"} for test purposes only to validate expired token response?
     // or stub myNygma?
     async () => {
       const httpResponse = await chai.request(app).get('/login/validate').set('authorization', 'non-valid-token');
-      expect(httpResponse.status).to.equal(404);
+      expect(httpResponse.status).to.equal(401);
       expect(httpResponse.body.message).to.equal("Invalid token");
     });
   })

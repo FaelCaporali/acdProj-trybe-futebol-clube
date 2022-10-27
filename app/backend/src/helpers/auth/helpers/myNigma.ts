@@ -1,8 +1,9 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
-import { IToken, IUser, IRole } from '../interfaces';
+import HttpException from '../../error/HttpException';
 import { INygma } from '../interfaces/Nygma';
+import { IToken, IUser, IRole } from '../interfaces';
 
 const ALGORITHM = 'aes-128-gcm';
 
@@ -36,10 +37,14 @@ export default class MyNygma implements INygma {
   }
 
   validateToken({ token }: IToken): IRole {
-    const { payload } = jwt.verify(token, this.jwtSecret) as { payload: string };
-    console.log(this.deHashUser(payload));
-    const { role } = this.deHashUser(payload);
-    return { role } as IRole;
+    try {
+      const { payload } = jwt.verify(token, this.jwtSecret) as { payload: string };
+      const { role } = this.deHashUser(payload);
+      return { role } as IRole;
+    } catch (e) {
+      console.error(e);
+      throw new HttpException(401, 'Invalid token');
+    }
   }
 
   private hashUser(user: IUser): string {

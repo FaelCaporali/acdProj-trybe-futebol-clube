@@ -1,5 +1,5 @@
 import Team from '../database/models/Team';
-import { ITeam, ITeamServices } from '../interfaces/Team.interfaces';
+import { ITeam, ITeamServices } from './interfaces/Team.interfaces';
 
 export default class TeamServices implements ITeamServices {
   private readonly model: typeof Team;

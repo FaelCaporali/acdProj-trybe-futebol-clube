@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import auth from './helpers/auth/routes';
 import httpErrorMiddleware from './helpers/error/middleware';
 import teams from './routes/teams.routes';
+import match from './routes/matches.routes';
 
 class App {
   public app: express.Express;
@@ -37,6 +38,7 @@ class App {
   private authRouter() {
     this.app.use('/login', auth);
     this.app.use('/teams', teams);
+    this.app.use('/matches', match);
     this.app.use(httpErrorMiddleware);
   }
 

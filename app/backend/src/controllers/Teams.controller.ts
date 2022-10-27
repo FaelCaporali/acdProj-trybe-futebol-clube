@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { ITeamServices } from '../interfaces/Team.interfaces';
+import { ITeamServices } from '../services/interfaces/Team.interfaces';
 
 export default class TeamsCtl {
   constructor(private readonly services: ITeamServices) {

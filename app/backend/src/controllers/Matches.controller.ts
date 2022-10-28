@@ -14,8 +14,7 @@ export default class MatchCtl {
     next: NextFunction,
   ): Promise<Response | void> {
     try {
-      const payload: unknown = req.query;
-      const matches = await this.services.matches(payload as TMatchQuery);
+      const matches = await this.services.matches(req.query as TMatchQuery);
       return res.status(200).json(matches);
     } catch (e) {
       next(e);

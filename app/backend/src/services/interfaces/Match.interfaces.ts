@@ -1,12 +1,14 @@
+import Match from '../../database/models/Match';
+
 export type TMatchQuery = {
-  inProgress: boolean;
+  inProgress: string;
 } | Record<string, never>;
 
 type MatchStatus = {
   message: 'Finished' | 'Scheduled' | 'Started',
 };
 export interface IMatchService {
-  matches(query?: TMatchQuery): Promise<IMatch[] | undefined>;
+  matches(query?: TMatchQuery): Promise<IMatch[] | undefined | Match[]>;
   scheduleMatch(match: IMatchSchedule): Promise< MatchStatus | undefined>
   startWhistle(match: IMatchRequest): Promise< IDBMatch | undefined>;
   finishWhistle(id: number): Promise< MatchStatus | undefined>;

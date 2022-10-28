@@ -1,11 +1,8 @@
 import { Router } from 'express';
-import AuthCtl from '../controller/index';
-import verifyRequest from '../middleware/internalVerification';
-import AuthServices from '../service';
+import authCtl from '../shared/auth/controller/index';
+import verifyRequest from '../shared/auth/middleware/internalVerification';
 
 const auth = Router();
-const authService = new AuthServices();
-const authCtl = new AuthCtl(authService);
 
 auth.post(
   '/',

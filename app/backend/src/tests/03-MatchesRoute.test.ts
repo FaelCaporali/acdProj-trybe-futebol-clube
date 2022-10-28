@@ -11,7 +11,7 @@ import User from "../database/models/User";
 
 import { IMatchRequest, IScore } from "./../services/interfaces/Match.interfaces";
 import { ITeam } from "./../services/interfaces/Team.interfaces";
-import MyNygma from "../helpers/myNygma";
+import MyNygma from "../shared/myNygma";
 
 const GOOD_CREDENTIALS = {
   email: "admin@admin.com",
@@ -258,7 +258,7 @@ describe("/matches services:", () => {
     });
   });
 
-  describe("(patch)/matches/:id/finish", () => {
+  describe("(patch)/matches/:id", () => {
     before(() => {
       sinon.stub(Match, "update").resolves([1 , GOOD_POST_MATCH_RESPONSE as Match[]]);
       sinon.stub(User, 'findOne').resolves({ 

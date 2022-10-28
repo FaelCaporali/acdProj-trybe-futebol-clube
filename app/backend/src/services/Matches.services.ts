@@ -1,11 +1,10 @@
 import { Op } from 'sequelize';
 import Match from '../database/models/Match';
 import Team from '../database/models/Team';
+import HttpException from '../shared/error/HttpException';
 import {
-  IDBMatch, TMatchQuery, IMatchRequest, IMatchService, IScore,
+  IDBMatch, TMatchQuery, IMatchRequest, IMatchService, IScore, IMatchSchedule,
 } from './interfaces/Match.interfaces';
-
-const NOT_IMPLEMENTED = new Error('Method not implemented.');
 
 export default class MatchServices implements IMatchService {
   private readonly model: typeof Match;
@@ -32,21 +31,51 @@ export default class MatchServices implements IMatchService {
     }) as Match[];
   }
 
-  async scheduleMatch(match: IMatchRequest): Promise<IDBMatch | undefined> {
-    return await this.model.create({ ...match }) as IDBMatch;
+  async postMatchHandler(match: IMatchSchedule): Promise<IDBMatch | undefined> {
+    const homeTeam = await this.model.findByPk(match.homeTeam);
+    const awayTeam = await this.model.findByPk(match.awayTeam);
+    if (!homeTeam || !awayTeam) throw new HttpException(404, 'There is no team with such id!');
+
+    // Preferi validar a duplicidade de times aqui para evitar erros.
+    // Mesmo com algum erro de inferência de tipo ou algum tipo de injection, achando os dois times no banco de dados e confirmando que são diferentes me parece mais seguro.
+    if (homeTeam.id === awayTeam.id) {
+      throw new HttpException(422, 'It is not possible to create a match with two equal teams');
+    }
+
+    if (match.inProgress) {
+      const newMatch = await this.scheduleMatch(match);
+      return newMatch;
+    }
+    const newMatch = await this.startWhistle(match);
+    return newMatch;
   }
 
-  async startWhistle(match: IMatchRequest): Promise<IDBMatch | undefined> {
+  private async scheduleMatch(match: IMatchRequest): Promise<IDBMatch | undefined> {
+    return await this.model.create(match) as IDBMatch;
+  }
+
+  private async startWhistle(match: IMatchRequest): Promise<IDBMatch | undefined> {
     return await this.model.create({ ...match, inProgress: true }) as IDBMatch;
   }
 
-  async finishWhistle(_id: number): Promise<{ message: 'Finished'; } | undefined> {
-    console.log(this.matches({}));
-    throw NOT_IMPLEMENTED;
+  async finishWhistle(id: number): Promise<{ message: 'Finished'; } | undefined> {
+    const match = await this.model.findByPk(id);
+    const update = await this.model.update({ ...match, inProgress: false }, { where: { id } });
+    if (update[0] === 1) return { message: 'Finished' };
   }
 
-  async score(_scoreToSet: IScore): Promise<IDBMatch | undefined> {
-    console.log(this.matches({}));
-    throw NOT_IMPLEMENTED;
+  async score(scoreToSet: IScore, id: string): Promise<IDBMatch | undefined> {
+    const _id = Number(id);
+    const match = await this.model.findByPk(_id);
+    if (match?.inProgress === true) {
+      const update = await this.model.update({ ...match, ...scoreToSet }, { where: { id: _id } });
+      if (update[0] === 1) {
+        const confirm = await this.model.findByPk(_id) as IDBMatch;
+        return confirm;
+      }
+    } else if (match?.inProgress === false) {
+      throw new HttpException(422, 'Match has already ended or not started yet');
+    }
+    throw new HttpException(500, 'Internal server error');
   }
 }

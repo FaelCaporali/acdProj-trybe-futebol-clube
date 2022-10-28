@@ -43,7 +43,7 @@ export default class MyNygma implements INygma {
       return { role } as IRole;
     } catch (e) {
       console.error(e);
-      throw new HttpException(401, 'Invalid token');
+      throw new HttpException(401, 'Token must be a valid token');
     }
   }
 

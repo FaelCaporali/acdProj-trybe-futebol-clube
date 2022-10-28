@@ -31,7 +31,7 @@ export default class AuthServices implements IAuthServices {
     return newUser as IUser;
   }
 
-  public async validate(token: IToken): Promise<IRole | void> {
+  public async validate(token: IToken): Promise<IRole> {
     const userRole = this.nygma.validateToken(token);
     return userRole;
   }

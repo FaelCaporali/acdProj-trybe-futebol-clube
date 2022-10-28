@@ -1,9 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
 import { IAuthServices, IToken } from '../interfaces';
+import AuthServices from '../service';
 
-export default class AuthCtl {
-  constructor(private readonly services: IAuthServices) {
-    this.services = services;
+class AuthCtl {
+  private readonly services: IAuthServices;
+  constructor() {
+    this.services = new AuthServices();
+  }
+
+  public async middleware(
+    req: Request,
+    _res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { headers: { authorization } } = req;
+      const { role } = await this.services.validate({ token: authorization } as IToken);
+      req.headers.role = role;
+      return next();
+    } catch (e) {
+      next(e);
+    }
   }
 
   public async authenticate(
@@ -36,3 +53,6 @@ export default class AuthCtl {
     }
   }
 }
+
+const auth = new AuthCtl();
+export default auth;

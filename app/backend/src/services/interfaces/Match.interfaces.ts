@@ -9,10 +9,9 @@ type MatchStatus = {
 };
 export interface IMatchService {
   matches(query?: TMatchQuery): Promise<IMatch[] | undefined | Match[]>;
-  scheduleMatch(match: IMatchSchedule): Promise< IDBMatch | undefined>
-  startWhistle(match: IMatchRequest): Promise< IDBMatch | undefined>;
+  postMatchHandler(match: IMatchSchedule): Promise< IDBMatch | undefined>;
   finishWhistle(id: number): Promise< MatchStatus | undefined>;
-  score(scoreToSet: IScore): Promise<IDBMatch | undefined>;
+  score(scoreToSet: IScore, id: string): Promise<IDBMatch | undefined>;
 }
 
 export interface IScore {
@@ -26,7 +25,7 @@ export interface IMatchRequest extends IScore {
 }
 
 export interface IMatchSchedule extends IMatchRequest {
-  inProgress: boolean;
+  inProgress: string;
 }
 export interface IDBMatch extends IMatchRequest {
   id: number;

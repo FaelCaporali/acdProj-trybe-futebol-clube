@@ -1,5 +1,6 @@
 import { Model, INTEGER, BOOLEAN } from 'sequelize';
 import { MatchAttributes, MatchCreationAttributes } from './types/Match';
+// import HttpException from '../../shared/error/HttpException';
 import db from '.';
 import Team from './Team';
 
@@ -46,17 +47,11 @@ Match.init({
     field: 'in_progress',
   },
 }, {
-  // ... Outras configs
   underscored: true,
   sequelize: db,
   modelName: 'matches',
   timestamps: false,
 });
-
-/**
-  * `Workaround` para aplicar as associations em TS:
-  * Associations 1:N devem ficar em uma das instâncias de modelo
-  * */
 
 Match.belongsTo(Team, { foreignKey: { field: 'home_team' }, as: 'teamHome' });
 Match.belongsTo(Team, { foreignKey: { field: 'away_team' }, as: 'teamAway' });

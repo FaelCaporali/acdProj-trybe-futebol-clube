@@ -1,8 +1,8 @@
 import * as express from 'express';
 import * as cors from 'cors';
 import helmet from 'helmet';
-import auth from './helpers/auth/routes';
-import httpErrorMiddleware from './helpers/error/middleware';
+import auth from './routes/login.routes';
+import httpErrorMiddleware from './shared/error/middleware';
 import teams from './routes/teams.routes';
 import match from './routes/matches.routes';
 

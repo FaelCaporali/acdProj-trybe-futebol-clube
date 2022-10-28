@@ -3,7 +3,7 @@ import { Model } from "sequelize";
 import chaiHttp = require("chai-http");
 import * as sinon from "sinon";
 import * as chai from "chai";
-import { before } from "mocha";
+import { afterEach, before } from "mocha";
 
 import { app } from "../app";
 import Match from "../database/models/Match";
@@ -174,9 +174,10 @@ describe("/matches services:", () => {
 
   describe("(get)/matches/query - fine query", () => {
     before(() => {
-      sinon.stub(Match, "findOne")
-        .onFirstCall().returns(ALL_MATCHES_RESPONSE[0] as Promise<Match>)
-        .onSecondCall().returns(ALL_MATCHES_RESPONSE[1] as Promise<Match>);
+      const firstResponse = [] as unknown[][];
+      sinon.stub(Match, "findAll")
+        .onFirstCall().resolves([ALL_MATCHES_RESPONSE[0]] as Match[])
+        .onSecondCall().resolves([ALL_MATCHES_RESPONSE[1]] as Match[]);
     });
     after(() => sinon.restore());
 
@@ -186,7 +187,7 @@ describe("/matches services:", () => {
         .get("/matches?inProgress=true");
 
       expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body.message).to.deep.equal(ALL_MATCHES_RESPONSE[1]);
+      expect(httpResponse.body).to.deep.equal([ALL_MATCHES_RESPONSE[0]]);
     });
 
     it("Resolves with inatives matches", async () => {
@@ -195,7 +196,7 @@ describe("/matches services:", () => {
         .get("/matches?inProgress=false");
 
       expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body.message).to.deep.equal(ALL_MATCHES_RESPONSE[0]);
+      expect(httpResponse.body).to.deep.equal([ALL_MATCHES_RESPONSE[1]]);
     });
   });
 

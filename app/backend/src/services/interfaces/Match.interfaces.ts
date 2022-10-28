@@ -1,10 +1,12 @@
+export type TMatchQuery = {
+  inProgress: boolean;
+} | Record<string, never>;
+
 type MatchStatus = {
   message: 'Finished' | 'Scheduled' | 'Started',
 };
 export interface IMatchService {
-  findAll(): Promise<IMatch[] | undefined>;
-  findActive(): Promise<IMatch[] | undefined>;
-  findFinished(): Promise<IMatch[] | undefined>;
+  matches(query?: TMatchQuery): Promise<IMatch[] | undefined>;
   scheduleMatch(match: IMatchSchedule): Promise< MatchStatus | undefined>
   startWhistle(match: IMatchRequest): Promise< IDBMatch | undefined>;
   finishWhistle(id: number): Promise< MatchStatus | undefined>;

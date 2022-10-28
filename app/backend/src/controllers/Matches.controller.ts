@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { TMatchQuery } from '../services/interfaces/Match.interfaces';
 import MatchServices from '../services/Matches.services';
 
 export default class MatchCtl {
@@ -7,9 +8,14 @@ export default class MatchCtl {
     this.services = new MatchServices();
   }
 
-  async getAll(_req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+  async matches(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | void> {
     try {
-      const matches = await this.services.findAll();
+      const payload: unknown = req.query;
+      const matches = await this.services.matches(payload as TMatchQuery);
       return res.status(200).json(matches);
     } catch (e) {
       next(e);

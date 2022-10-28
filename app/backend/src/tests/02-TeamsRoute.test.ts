@@ -54,7 +54,7 @@ describe('/teams services:', () => {
     })
     after(() => sinon.restore());
     
-    it('1.2.1. Should return an 404 status with an error message if team is not found', async () => {
+    it('1.2.1. Should return an 404 status with an error message if team id is not found', async () => {
       const httpResponse = await chai
         .request(app)
         .get('/teams/999');

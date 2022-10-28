@@ -6,4 +6,6 @@ const matchCtl = new MatchCtl();
 
 match.get('/', async (req, res, next) => matchCtl.getAll(req, res, next));
 
+// match.use(authMiddleware); -> nextOn they are private routes
+
 export default match;

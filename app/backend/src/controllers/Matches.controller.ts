@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import MatchServices from '../services/Matches.services';
-import { IMatchService } from '../services/interfaces/Match.interfaces';
 
 export default class MatchCtl {
-  private readonly services: IMatchService;
+  private readonly services: MatchServices;
   constructor() {
     this.services = new MatchServices();
   }

@@ -1,7 +1,7 @@
 import Match from '../database/models/Match';
 import Team from '../database/models/Team';
 import {
-  IDBMatch, IMatch, IMatchRequest, IMatchService, IScore,
+  IDBMatch, IMatch, IMatchRequest, IMatchSchedule, IMatchService, IScore,
 } from './interfaces/Match.interfaces';
 
 const NOT_IMPLEMENTED = new Error('Method not implemented.');
@@ -30,6 +30,11 @@ export default class MatchServices implements IMatchService {
   }
 
   async findFinished(): Promise<IMatch[] | undefined> {
+    console.log(this.findAll());
+    throw NOT_IMPLEMENTED;
+  }
+
+  async scheduleMatch(_match: IMatchSchedule): Promise<{ message: 'Scheduled' } | undefined> {
     console.log(this.findAll());
     throw NOT_IMPLEMENTED;
   }

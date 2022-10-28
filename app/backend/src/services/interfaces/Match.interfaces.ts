@@ -1,9 +1,13 @@
+type MatchStatus = {
+  message: 'Finished' | 'Scheduled' | 'Started',
+};
 export interface IMatchService {
   findAll(): Promise<IMatch[] | undefined>;
   findActive(): Promise<IMatch[] | undefined>;
   findFinished(): Promise<IMatch[] | undefined>;
-  startWhistle(match: IMatchRequest): Promise<IDBMatch | undefined>;
-  finishWhistle(id: number): Promise<{ message: 'Finished' } | undefined>;
+  scheduleMatch(match: IMatchSchedule): Promise< MatchStatus | undefined>
+  startWhistle(match: IMatchRequest): Promise< IDBMatch | undefined>;
+  finishWhistle(id: number): Promise< MatchStatus | undefined>;
   score(scoreToSet: IScore): Promise<IDBMatch | undefined>;
 }
 
@@ -17,9 +21,11 @@ export interface IMatchRequest extends IScore {
   awayTeam: number;
 }
 
-export interface IDBMatch extends IMatchRequest {
-  id?: number;
+export interface IMatchSchedule extends IMatchRequest {
   inProgress: boolean;
+}
+export interface IDBMatch extends IMatchRequest {
+  id: number;
 }
 
 export interface IMatch extends IDBMatch {

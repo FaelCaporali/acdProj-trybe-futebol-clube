@@ -12,30 +12,30 @@ class App {
   constructor() {
     this.app = express();
 
-    this.config();
-    this.authRouter();
+    this.configApp();
+    this.configRoutes();
 
     // Não remover essa rota
     this.app.get('/', (req, res) => res.json({ ok: true }));
   }
 
-  private config():void {
-    const accessControl: express.RequestHandler = (_req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*');
-      res.header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS,PUT,PATCH');
-      res.header('Access-Control-Allow-Headers', '*');
-      next();
-    };
+  private configApp():void {
+    // const accessControl: express.RequestHandler = (_req, res, next) => {
+    //   res.header('Access-Control-Allow-Origin', '*');
+    //   res.header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS,PUT,PATCH');
+    //   res.header('Access-Control-Allow-Headers', '*');
+    //   next();
+    // };
 
     this.app.use(express.json());
 
     this.app.use(cors());
     this.app.use(helmet());
     // Para evitar conflitos de headers, a configuração inicial do projeto é mantida abaixo para sobrescrever o cors e helmet;
-    this.app.use(accessControl);
+    // this.app.use(accessControl);
   }
 
-  private authRouter() {
+  private configRoutes() {
     this.app.use('/login', auth);
     this.app.use('/teams', teams);
     this.app.use('/matches', match);

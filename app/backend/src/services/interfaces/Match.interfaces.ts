@@ -9,7 +9,7 @@ type MatchStatus = {
 };
 export interface IMatchService {
   matches(query?: TMatchQuery): Promise<IMatch[] | undefined | Match[]>;
-  scheduleMatch(match: IMatchSchedule): Promise< MatchStatus | undefined>
+  scheduleMatch(match: IMatchSchedule): Promise< IDBMatch | undefined>
   startWhistle(match: IMatchRequest): Promise< IDBMatch | undefined>;
   finishWhistle(id: number): Promise< MatchStatus | undefined>;
   score(scoreToSet: IScore): Promise<IDBMatch | undefined>;

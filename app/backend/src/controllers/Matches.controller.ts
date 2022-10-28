@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { TMatchQuery } from '../services/interfaces/Match.interfaces';
+import { IDBMatch, TMatchQuery } from '../services/interfaces/Match.interfaces';
 import MatchServices from '../services/Matches.services';
 
 export default class MatchCtl {
@@ -8,17 +8,25 @@ export default class MatchCtl {
     this.services = new MatchServices();
   }
 
-  async newMatch(req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
+  async newMatch(
+    { body }: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> {
     try {
-      const match = req.body;
-      const confirmation = await this.services.startWhistle(match);
-      return res.status(201).json(confirmation);
+      let match: IDBMatch | undefined;
+      if (body.inProgress) {
+        match = await this.services.scheduleMatch(body);
+      } else {
+        match = await this.services.startWhistle(body);
+      }
+      return res.status(201).json(match);
     } catch (e) {
       next(e);
     }
   }
 
-  async matches(
+  async getMatches(
     req: Request,
     res: Response,
     next: NextFunction,

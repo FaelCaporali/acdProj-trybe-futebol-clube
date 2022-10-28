@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import Match from '../database/models/Match';
 import Team from '../database/models/Team';
 import {
-  IDBMatch, TMatchQuery, IMatchRequest, IMatchSchedule, IMatchService, IScore,
+  IDBMatch, TMatchQuery, IMatchRequest, IMatchService, IScore,
 } from './interfaces/Match.interfaces';
 
 const NOT_IMPLEMENTED = new Error('Method not implemented.');
@@ -32,9 +32,8 @@ export default class MatchServices implements IMatchService {
     }) as Match[];
   }
 
-  async scheduleMatch(_match: IMatchSchedule): Promise<{ message: 'Scheduled' } | undefined> {
-    console.log(this.matches({}));
-    throw NOT_IMPLEMENTED;
+  async scheduleMatch(match: IMatchRequest): Promise<IDBMatch | undefined> {
+    return await this.model.create({ ...match }) as IDBMatch;
   }
 
   async startWhistle(match: IMatchRequest): Promise<IDBMatch | undefined> {

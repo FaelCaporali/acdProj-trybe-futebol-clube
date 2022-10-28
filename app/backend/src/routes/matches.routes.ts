@@ -4,7 +4,7 @@ import MatchCtl from '../controllers/Matches.controller';
 const match = Router();
 const matchCtl = new MatchCtl();
 
-match.get('/', (req, res, next) => matchCtl.matches(req, res, next));
+match.get('/', (req, res, next) => matchCtl.getMatches(req, res, next));
 
 // match.use(authMiddleware); -> nextOn they are private routes
 

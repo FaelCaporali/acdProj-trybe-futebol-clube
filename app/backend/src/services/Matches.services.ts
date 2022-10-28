@@ -37,9 +37,8 @@ export default class MatchServices implements IMatchService {
     throw NOT_IMPLEMENTED;
   }
 
-  async startWhistle(_match: IMatchRequest): Promise<IDBMatch | undefined> {
-    console.log(this.matches({}));
-    throw NOT_IMPLEMENTED;
+  async startWhistle(match: IMatchRequest): Promise<IDBMatch | undefined> {
+    return await this.model.create({ ...match, inProgress: true }) as IDBMatch;
   }
 
   async finishWhistle(_id: number): Promise<{ message: 'Finished'; } | undefined> {

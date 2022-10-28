@@ -8,4 +8,6 @@ match.get('/', (req, res, next) => matchCtl.matches(req, res, next));
 
 // match.use(authMiddleware); -> nextOn they are private routes
 
+match.post('/', (req, res, next) => matchCtl.newMatch(req, res, next));
+
 export default match;

@@ -25,9 +25,9 @@ export interface IMatchRequest extends IScore {
 }
 
 export interface IMatchSchedule extends IMatchRequest {
-  inProgress: string;
+  inProgress?: 'true' | 'false' | boolean;
 }
-export interface IDBMatch extends IMatchRequest {
+export interface IDBMatch extends IMatchSchedule {
   id: number;
 }
 

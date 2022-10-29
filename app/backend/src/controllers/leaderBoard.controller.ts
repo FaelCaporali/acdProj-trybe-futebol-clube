@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import Team from '../services/Team.services';
+import LeaderBoard from '../services/LeaderBoard.services';
 
 export default class BoardCtl {
-  private readonly services: Team;
+  private readonly services: LeaderBoard;
 
   constructor() {
-    this.services = new Team();
+    this.services = new LeaderBoard();
   }
 
   async main(req: Request, res: Response, next: NextFunction): Promise<Response | void> {

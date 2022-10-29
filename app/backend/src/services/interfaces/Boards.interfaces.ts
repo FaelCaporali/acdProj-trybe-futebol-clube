@@ -8,5 +8,11 @@ export interface IScoreBoard {
   goalsFavor: number;
   goalsOwn: number;
   goalsBalance: number;
-  efficiency: number;
+  efficiency: string;
+}
+
+export interface IBoardServices {
+  fullBoard(): Promise<IScoreBoard[] | void>;
+  homeBoard(): Promise<IScoreBoard[] | void>;
+  awayBoard(): Promise<IScoreBoard[] | void>;
 }

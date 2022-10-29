@@ -53,5 +53,4 @@ services:
       # test: mysqladmin ping -h 127.0.0.1 -u root --password=123456 # Deve aguardar o banco ficar operacional
       test: "/usr/bin/mysql --user=root --password=123456 --execute \"SHOW DATABASES;\""
       interval: 25s
-      timeout: 375s
       retries: 15

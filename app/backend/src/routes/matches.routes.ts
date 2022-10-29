@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import MatchCtl from '../controllers/Matches.controller';
+import MatchCtl from '../controllers/matches.controller';
 import auth from '../shared/auth/controller';
 
 const match = Router();

@@ -5,6 +5,7 @@ import auth from './routes/login.routes';
 import httpErrorMiddleware from './shared/error/middleware';
 import teams from './routes/teams.routes';
 import match from './routes/matches.routes';
+import board from './routes/leaderBoard.routes';
 
 class App {
   public app: express.Express;
@@ -39,6 +40,7 @@ class App {
     this.app.use('/login', auth);
     this.app.use('/teams', teams);
     this.app.use('/matches', match);
+    this.app.use('/leaderboard', board);
     this.app.use(httpErrorMiddleware);
   }
 

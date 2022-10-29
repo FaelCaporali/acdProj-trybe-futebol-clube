@@ -130,13 +130,22 @@ describe('/login services:', () => {
       expect(httpResponse.body.role).to.equal('admin');
     });
 
-    it('1.3.2. Should return a status 401 and "Invalid token" as a message value, in body response, if token is invalid or not provided',
+    it('1.3.2. Should return a status 401 and "Token must be a valid token" as a message value, in body response, if token is invalid',
     // set a optional body key in user -> {"expires":"time"} for test purposes only to validate expired token response?
     // or stub myNygma?
     async () => {
       const httpResponse = await chai.request(app).get('/login/validate').set('authorization', 'non-valid-token');
       expect(httpResponse.status).to.equal(401);
-      expect(httpResponse.body.message).to.equal("Invalid token");
+      expect(httpResponse.body.message).to.equal("Token must be a valid token");
+    });
+
+    it('1.3.2. Should return a status 400 and "" as a message value, in body response, if token is invalid',
+    // set a optional body key in user -> {"expires":"time"} for test purposes only to validate expired token response?
+    // or stub myNygma?
+    async () => {
+      const httpResponse = await chai.request(app).get('/login/validate');
+      expect(httpResponse.status).to.equal(400);
+      expect(httpResponse.body.message).to.equal("Must provide credentials");
     });
   })
 });

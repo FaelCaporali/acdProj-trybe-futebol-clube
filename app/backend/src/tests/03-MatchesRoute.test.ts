@@ -164,7 +164,7 @@ describe("/matches services:", () => {
     });
     after(() => sinon.restore());
 
-    it("Should return an 404 status and any not found message for an invalid id, on route /matches/:id", async () => {
+    it("Should return an 404 status and any not found message for an invalid id, on route get /matches/:id", async () => {
       const httpResponse = await chai.request(app).get("/matches/980");
 
       expect(httpResponse.status).to.equal(404);
@@ -260,7 +260,8 @@ describe("/matches services:", () => {
 
   describe("(patch)/matches/:id", () => {
     before(() => {
-      sinon.stub(Match, "update").resolves([1 , GOOD_POST_MATCH_RESPONSE as Match[]]);
+      sinon.stub(Match, "update").resolves([1, []]);
+      sinon.stub(Match, 'findByPk').resolves(GOOD_POST_MATCH_RESPONSE as Model);
       sinon.stub(User, 'findOne').resolves({ 
         ...GOOD_CREDENTIALS,
         password: nygmaHelper.hashPassword(GOOD_CREDENTIALS.password),
@@ -306,7 +307,7 @@ describe("/matches services:", () => {
 
       responses.forEach((response) => {
         expect(response.status).to.equal(400);
-        expect(response.body).to.deep.equal({ message: "Token required" });
+        expect(response.body).to.deep.equal({ message: "Must provide credentials" });
       });
     });
 

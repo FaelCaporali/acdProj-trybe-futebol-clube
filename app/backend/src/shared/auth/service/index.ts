@@ -32,6 +32,7 @@ export default class AuthServices implements IAuthServices {
   }
 
   public async validate(token: IToken): Promise<IRole> {
+    if (!token.token) throw new HttpException(400, 'Must provide credentials');
     const userRole = this.nygma.validateToken(token);
     return userRole;
   }

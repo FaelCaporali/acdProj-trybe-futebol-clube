@@ -4,44 +4,36 @@ import Team from "../database/models/Team";
 import chaiHttp = require("chai-http");
 import * as chai from "chai";
 import * as sinon from "sinon";
-import { Model } from 'sequelize';
+import { Model } from "sequelize";
 import { app } from "../app";
 import { beforeEach } from "mocha";
 const { expect } = chai;
 
 chai.use(chaiHttp);
 
-describe("Rota leaderboards", () => {
+describe("Nas Rotas /leaderboards", () => {
   beforeEach(() => {
     sinon.stub(Match, "findAll").resolves(ALL_MATCHES as Match[]);
     sinon.stub(Team, "findAll").resolves(ALL_TEAMS as Team[]);
   });
   afterEach(() => {
     sinon.restore();
-  })
-  describe("Home", () => {
-    it("testa o retorno correto da tabela", async () => {
-      const response = await chai.request(app).get("/leaderboard/home");
-      expect(response.status).to.equal(200);
-      expect(response.body).to.deep.equal(HOME_TEAMS_SCORES);
-    });
   });
-
-  describe("Away", () => {
-    it("testa o retorno correto da tabela", async () => {
-      const response = await chai.request(app).get("/leaderboard/away");
-      expect(response.status).to.equal(200);
-      expect(response.body).to.deep.equal(HOME_TEAMS_SCORES);
-    });
+  it("/home -> tendo os dados do banco forenecidos como na DB incicial, testa o resultado da classificação", async () => {
+    const response = await chai.request(app).get("/leaderboard/home");
+    expect(response.status).to.equal(200);
+    expect(response.body).to.deep.equal(HOME_TEAMS_SCORES);
   });
-
-  describe("/", () => {
-    it("testa o retorno correto da tabela", async () => {
-      const response = await chai.request(app).get("/leaderboard");
-      expect(response.status).to.equal(200);
-      expect(response.body).to.deep.equal(HOME_TEAMS_SCORES);
-    });
+  it("/away -> tendo os dados do banco forenecidos como na DB incicial, testa o resultado da classificação", async () => {
+    const response = await chai.request(app).get("/leaderboard/away");
+    expect(response.status).to.equal(200);
+    expect(response.body).to.deep.equal(AWAY_TEAM_SCORES);
   });
+});
+it("/ -> tendo os dados do banco forenecidos como na DB incicial, testa o resultado da classificação", async () => {
+  const response = await chai.request(app).get("/leaderboard");
+  expect(response.status).to.equal(200);
+  expect(response.body).to.deep.equal(FULL_SCORE);
 });
 
 const HOME_TEAMS_SCORES = [

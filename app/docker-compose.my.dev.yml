@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 services:
   frontend:
     build: ./frontend
@@ -54,3 +54,4 @@ services:
       test: "/usr/bin/mysql --user=root --password=123456 --execute \"SHOW DATABASES;\""
       interval: 25s
       retries: 15
+      timeout: 300s

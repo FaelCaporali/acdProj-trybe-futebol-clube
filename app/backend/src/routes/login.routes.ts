@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import authCtl from '../shared/auth/controller/index';
-import verifyRequest from '../shared/auth/middleware/internalVerification';
+import AuthMiddleware from '../shared/auth/middleware';
 
 const auth = Router();
+const mid = new AuthMiddleware();
 
 auth.post(
   '/',
-  (req, res, next) => verifyRequest(req, res, next),
+  (req, res, next) => mid.logRequest(req, res, next),
   (req, res, next) => authCtl.login(req, res, next),
 );
 

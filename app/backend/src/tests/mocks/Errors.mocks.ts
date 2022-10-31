@@ -7,6 +7,9 @@ const AUTH_ERRORS = {
     }
 };
 
+const GENERAL_ERROR = new Error('Any error without a code');
+
 export {
 AUTH_ERRORS,
+GENERAL_ERROR,
 }

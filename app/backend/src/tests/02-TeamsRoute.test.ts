@@ -1,9 +1,8 @@
+import { Model } from 'sequelize';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 import * as sinon from 'sinon';
 import * as chai from 'chai';
-import { Model } from 'sequelize';
-
 import { app } from '../app';
 import Team from '../database/models/Team';
 import { before } from 'mocha';
@@ -50,7 +49,7 @@ describe('/teams services:', () => {
 
   describe('1.2. (get)/teams - bad request received', () => {
     before(() => {
-      sinon.stub(Model, 'findOne').resolves({} as Team);
+      sinon.stub(Team, 'findOne').resolves(null);
     })
     after(() => sinon.restore());
     

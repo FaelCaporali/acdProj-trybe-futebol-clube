@@ -3,149 +3,182 @@ import chaiHttp = require('chai-http');
 import * as sinon from 'sinon';
 import * as chai from 'chai';
 import { Model } from 'sequelize';
+import { before } from 'mocha';
 
 import { app } from '../app';
 import User from '../database/models/User';
-import { before } from 'mocha';
+
+import {
+FAKE_USER,
+GOOD_CREDENTIALS,
+MISSING_EMAIL_CREDENTIALS,
+INVALID_EMAIL_USER,
+MISSING_PASSWORD_USER,
+INVALID_MIN_LENGTH_PASSWORD,
+NON_REGISTERED_USER,
+BAD_CREDENTIALS,
+} from './mocks/Users.mocks';
+import { AUTH_ERRORS } from './mocks/Errors.mocks';
+import AuthServices from '../shared/auth/service';
 
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('/login services:', () => {
+describe('TESTS FOR /login ROUTES', () => {
   
-  describe('1.1. (POST)/login - good request received:', () => {
+  describe('(POST)/login - for a good request received:', async () => {
   
-    const user = { id: 1, username: 'admin', email: 'admin@admin.com', password: '$2a$08$xi.Hxk1czAO0nZR..B393u10aED0RQ1N3PAEXQ7HxtLjKPEZBu.PW' }
+    sinon.stub(Model, 'findOne').resolves(FAKE_USER as User);
 
-    before(() => {
-      sinon.stub(Model, 'findOne').resolves(user as User);
-    })
-    after(() => sinon.restore());
-  
-    it('1.1.1. Should return 200 status on the response', async () => {
-      const httpResponse = await chai
+    
+    const httpResponse = await chai
         .request(app)
         .post('/login')
-        .send({ email: 'admin@admin.com', password: 'secret_admin' });
-
+        .send(GOOD_CREDENTIALS);
+  
+    it('Should return 200 status on the response', () => {
       expect(httpResponse.status).to.equal(200);
     });
-
-    it('1.1.2. Should return an object with a single key named "token" and a string typed value on the response body', async () => {
-      const httpResponse = await chai
-        .request(app)
-        .post('/login')
-        .send({ email: 'admin@admin.com', password: 'secret_admin' });
-
-      expect(Object.keys(httpResponse.body)).to.deep.equal(['token']);
-      expect(typeof httpResponse.body.token).to.equal('string');
+    it('Should have a key named "token" on the response body', () => {
+      expect(Object.keys(httpResponse.body)).to.deep.equal(['token'])
     });
+    it('Should have a string valued token on the response body', () => {
+      expect(typeof httpResponse.body.token).to.equal('string')
+    });
+    sinon.restore();
   });
 
-  describe('1.2. (POST)/login - bad request received', () => {
-
-    const user = { id: 1, username: 'admin', email: 'admin@admin.com', password: '$2a$08$xi.Hxk1czAO0nZR..B393u10aED0RQ1N3PAEXQ7HxtLjKPEZBu.PW' }
-
-    before(() => {
-      sinon.stub(Model, 'findOne').resolves(user as User);
-    })
-    after(() => sinon.restore());
+  describe('(POST)/login - bad request received', () => {
     
-    it('1.2.1. Should require an email field on the request body', async () => {
-      const httpResponse = await chai
-        .request(app)
-        .post('/login')
-        .send({ password: 'secret_admin' });
+    describe('For invalid or missing fields', () => {
+      const modelSpy = sinon.spy(Model.findOne);
+      
+      it(`Should require an email field on the request body. If not found:
+      1. Should return an 400 status;
+      2. should return the right error message;
+      3. Should not try to access the DataBase`, async () => {
+        const httpResponse = await chai
+          .request(app)
+          .post('/login')
+          .send(MISSING_EMAIL_CREDENTIALS);
+  
+        expect(httpResponse.status).to.equal(400);
+        expect(httpResponse.body.message).to.deep.equal(AUTH_ERRORS.messages.missingField);
+        expect(modelSpy.called).to.equal(false);
+      });
 
-      expect(httpResponse.status).to.equal(400);
-      expect(httpResponse.body.message).to.deep.equal('All fields must be filled');
+      it(`Should require an non empty valid email string as the email field value. If not provided:
+      1. Should return an 401 status;
+      2. Should return the right error message;
+      3. Should not try to access the DataBase`, async () => {
+        const httpResponse = await chai
+          .request(app)
+          .post('/login')
+          .send(INVALID_EMAIL_USER);
+  
+        expect(httpResponse.status).to.equal(401);
+        expect(httpResponse.body.message).to.deep.equal(AUTH_ERRORS.messages.invalidField);
+        expect(modelSpy.called).to.equal(false);
+      });
+
+      it(`Should require password field on the request body, if not provided:
+      1. Should return an 400 status.
+      2. Should return the right error message.
+      3. Should not try to access the DataBase`, async () => {
+        const httpResponse = await chai
+          .request(app)
+          .post('/login')
+          .send(MISSING_PASSWORD_USER);
+  
+        expect(httpResponse.status).to.equal(400);
+        expect(httpResponse.body.message).to.deep.equal(AUTH_ERRORS.messages.missingField);
+        expect(modelSpy.called).to.equal(false);
+      });
+  
+      it(`Should require an 6 characters minimum length string as the password field value, if not provided:
+      1. Should return an 401 status;
+      2. Should return the right error message;
+      3. Should not try to access the DataBase`, async () => {
+        const httpResponse = await chai
+          .request(app)
+          .post('/login')
+          .send(INVALID_MIN_LENGTH_PASSWORD);
+  
+        expect(httpResponse.status).to.equal(401);
+        expect(httpResponse.body.message).to.deep.equal(AUTH_ERRORS.messages.invalidField);
+        expect(modelSpy.called).to.equal(false);
+      });
+
+      it('Confirms that non of the above tests has called the DataBase for an User roll', () => {
+        expect(modelSpy.callCount).to.equal(0);
+      });
+      sinon.restore();
     });
 
-    it('1.2.2. Should require an non empty valid email string as the email field value', async () => {
-      const httpResponse = await chai
-        .request(app)
-        .post('/login')
-        .send({ email: 'admin', password: 'secret_admin' });
+    describe('For bad credentials', () => {
+      before(() => {
+        sinon.stub(Model, 'findOne').resolves(FAKE_USER as User);
+      })
+      after(() => sinon.restore());
 
-      expect(httpResponse.status).to.equal(401);
-      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
-    });
-
-    it('1.2.3. Should require password field on the request body', async () => {
-      const httpResponse = await chai
-        .request(app)
-        .post('/login')
-        .send({ email: 'admin@admin.com' });
-
-      expect(httpResponse.status).to.equal(400);
-      expect(httpResponse.body.message).to.deep.equal('All fields must be filled');
-    });
-
-    it('1.2.4. Should require an 6 characters minimum length string as the password field value', async () => {
-      const httpResponse = await chai
-        .request(app)
-        .post('/login')
-        .send({ email: 'admin@admin.com', password: 'asd' });
-
-      expect(httpResponse.status).to.equal(401);
-      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
-    });
-
-    it('1.2.5. Should deny access to unregistered user', async () => {
-      const httpResponse = await chai
-        .request(app)
-        .post('/login')
-        .send({ email: 'socrates@admin.com', password: 'asd' });
-
-      expect(httpResponse.status).to.equal(401);
-      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
-    });
-
-    it('1.2.6. Should deny access if an incorrect password is provided', async () => {
-      const httpResponse = await chai
-        .request(app)
-        .post('/login')
-        .send({ email: 'admin@admin.com', password: 'my_secret_admin' });
-
-      expect(httpResponse.status).to.equal(401);
-      expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
+      it(`For an unregistered user:
+      1. Should return an 401 status;
+      2. Should return the right message on the response body;`, async () => {
+        const httpResponse = await chai
+          .request(app)
+          .post('/login')
+          .send(NON_REGISTERED_USER);
+  
+        expect(httpResponse.status).to.equal(401);
+        expect(httpResponse.body.message).to.deep.equal(AUTH_ERRORS.messages.invalidField);
+      });
+  
+      it('Should deny access if the hashed password provided doesn\'t match to the password on the DataBase, returning an 401 status.', async () => {
+        const httpResponse = await chai
+          .request(app)
+          .post('/login')
+          .send(BAD_CREDENTIALS);
+  
+        expect(httpResponse.status).to.equal(401);
+        expect(httpResponse.body.message).to.deep.equal(AUTH_ERRORS.messages.invalidField);
+      });
     });
   });
 
-  describe('1.3. (GET) /login/validate services - ', () => {
-    const user = { id: 1, username: 'admin', email: 'admin@admin.com', password: '$2a$08$xi.Hxk1czAO0nZR..B393u10aED0RQ1N3PAEXQ7HxtLjKPEZBu.PW', role: 'admin' };
+  describe('(GET) /login/validate services', () => {
     before(() => {
-      sinon.stub(Model, 'findOne').resolves(user as User);
-    })
-    after(() => sinon.restore())
+      sinon.stub(Model, 'findOne').resolves(FAKE_USER as User);
+      sinon.stub(Model, 'findByPk').resolves(FAKE_USER as User);
+    });
+    after(() => sinon.restore());
 
-    it('1.3.1. Should return the right user role if a valid token is provided on header "authorization" field', async () => {
+
+    it('Should return the right user role if a valid token is provided on header "authorization" field', async () => {
       const { body: { token } } = await chai
         .request(app)
         .post('/login')
-        .send({ email: 'admin@admin.com', password: 'secret_admin' });
+        .send(GOOD_CREDENTIALS);
       const httpResponse = await chai.request(app).get('/login/validate').set('authorization', token);
-      expect(httpResponse.body).to.deep.equal({ role: user.role });
-      expect(httpResponse.body.role).to.equal('admin');
+      expect(httpResponse.body).to.deep.equal({ role: FAKE_USER.role });
     });
 
-    it('1.3.2. Should return a status 401 and "Token must be a valid token" as a message value, in body response, if token is invalid',
-    // set a optional body key in user -> {"expires":"time"} for test purposes only to validate expired token response?
-    // or stub myNygma?
+    it('Should return a status 401 and "Token must be a valid token" as a message value in body response, if token is invalid',
     async () => {
       const httpResponse = await chai.request(app).get('/login/validate').set('authorization', 'non-valid-token');
       expect(httpResponse.status).to.equal(401);
-      expect(httpResponse.body.message).to.equal("Token must be a valid token");
+      expect(httpResponse.body.message).to.equal(AUTH_ERRORS.messages.invalidToken);
     });
 
-    it('1.3.2. Should return a status 400 and "" as a message value, in body response, if token is invalid',
-    // set a optional body key in user -> {"expires":"time"} for test purposes only to validate expired token response?
-    // or stub myNygma?
+    it('Should return a status 400 and "Must provide credentials" as a message value, in body response, if token is not provided. \n It should not try to access the DataBase',
     async () => {
+      sinon.restore();
+      const testSpy = sinon.spy(Model, 'findOne');
       const httpResponse = await chai.request(app).get('/login/validate');
+
       expect(httpResponse.status).to.equal(400);
-      expect(httpResponse.body.message).to.equal("Must provide credentials");
+      expect(httpResponse.body.message).to.equal(AUTH_ERRORS.messages.missingToken);
+      expect(testSpy.called).to.equal(false);
     });
   })
 });

@@ -42,9 +42,9 @@ export default class AuthServices implements IAuthServices {
     if (error) throw new HttpException(401, 'Incorrect email or password');
 
     const { email, password } = credentials;
-    const validUser = (await this.model.findOne({
+    const validUser = await this.model.findOne({
       where: { email },
-    })) as IFullUser;
+    }) as IFullUser;
     if (validUser === null
       || !this.nygma.compareHash(password, validUser.password)) {
       throw new HttpException(401, 'Incorrect email or password');

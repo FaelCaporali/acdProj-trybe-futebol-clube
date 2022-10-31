@@ -3,7 +3,7 @@ import { Model } from "sequelize";
 import chaiHttp = require("chai-http");
 import * as sinon from "sinon";
 import * as chai from "chai";
-import { afterEach, before } from "mocha";
+import { before } from "mocha";
 
 import { app } from "../app";
 import Match from "../database/models/Match";
@@ -295,32 +295,6 @@ describe("/matches services:", () => {
 
       expect(response.status).to.equal(200);
       expect(response.body).to.deep.equal({ message: 'Finished' });
-    });
-  });
-
-  describe("Tests for private routes access", async () => {
-    it("Should deny access with missing tokens, regardless the others requirements", async () => {
-
-      const promises: Promise<unknown>[] = PRIVATE_MATCHES_ROUTES.map(async ({method, route}) => await chai.request(app)[method](route));
-
-      const responses = await Promise.all(promises) as Response[];
-
-      responses.forEach((response) => {
-        expect(response.status).to.equal(400);
-        expect(response.body).to.deep.equal({ message: "Must provide credentials" });
-      });
-    });
-
-    it("Should deny access with bad tokens, regardless the others requirements", async () => {
-
-      const promises: Promise<unknown>[] = PRIVATE_MATCHES_ROUTES.map(async ({method, route}) => await chai.request(app)[method](route).set('authorization', BAD_TOKEN.token));
-
-      const responses = await Promise.all(promises) as Response[];
-
-      responses.forEach((response) => {
-        expect(response.status).to.equal(401);
-        expect(response.body).to.deep.equal({ message: "Token must be a valid token" });
-      });
     });
   });
 });

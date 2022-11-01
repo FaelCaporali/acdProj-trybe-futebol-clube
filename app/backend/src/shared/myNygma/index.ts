@@ -5,27 +5,35 @@ import HttpException from '../error/HttpException';
 import { INygma } from '../auth/interfaces/Nygma';
 import { IToken, IUser, IRole } from '../auth/interfaces';
 
-const ALGORITHM = 'aes-128-gcm';
+type CipherOptions = {
+  name: string;
+  ivBits: number;
+  saltBits: number;
+};
 
 export default class MyNygma implements INygma {
   private readonly salt: string;
   private iv: Buffer;
   private key: Buffer;
   private dHashUsed: boolean;
+  private readonly algorithm: string;
+  private readonly keyBits: number;
+  private readonly saltBits: number;
 
-  constructor(private readonly jwtSecret: string) {
+  constructor(private readonly jwtSecret: string, cipherOptions: CipherOptions) {
     this.jwtSecret = jwtSecret;
     this.salt = bcrypt.genSaltSync(15);
-    this.iv = crypto.randomBytes(16);
-    this.key = crypto.randomBytes(16);
+    this.iv = crypto.randomBytes(cipherOptions.saltBits);
+    this.key = crypto.randomBytes(cipherOptions.ivBits);
+    this.algorithm = cipherOptions.name;
   }
 
   hashPassword(password: string): string {
     return bcrypt.hashSync(password, this.salt);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   compareHash(password: string, hash: string): boolean {
-    if (typeof this.dHashUsed === 'function') console.log('dummy');
     return bcrypt.compareSync(password, hash);
   }
 
@@ -49,14 +57,14 @@ export default class MyNygma implements INygma {
 
   private hashUser(user: IUser): string {
     const string = JSON.stringify(user);
-    const cipher = crypto.createCipheriv(ALGORITHM, this.key, this.iv);
+    const cipher = crypto.createCipheriv(this.algorithm, this.key, this.iv);
     let cripted = cipher.update(string, 'utf8', 'hex');
     cripted += cipher.final('hex');
     return cripted;
   }
 
   private deHashUser(hash: string): IUser {
-    const deCipher = crypto.createDecipheriv(ALGORITHM, this.key, this.iv);
+    const deCipher = crypto.createDecipheriv(this.algorithm, this.key, this.iv);
     const user = deCipher.update(hash, 'hex', 'utf8');
     return JSON.parse(user);
   }

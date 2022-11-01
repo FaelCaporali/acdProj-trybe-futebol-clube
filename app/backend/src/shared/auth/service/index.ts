@@ -22,6 +22,7 @@ export default class AuthServices implements IAuthServices {
     this.model = User;
     this.nygma = new MyNygma(
       process.env.JWT_SECRET || 'Should have a better secret',
+      { name: 'aes-128-gcm', ivBits: 16, saltBits: 16 },
     );
     this.schemas = schema;
   }

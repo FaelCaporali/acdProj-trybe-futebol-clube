@@ -61,17 +61,5 @@ describe('/teams services:', () => {
       expect(httpResponse.status).to.equal(404);
       expect(httpResponse.body.message).to.deep.equal('No team found');
     });
-
-    // test private route with credentials implementation?
-
-    // it('1.2.2. Should require an non empty valid email string as the email field value', async () => {
-    //   const httpResponse = await chai
-    //     .request(app)
-    //     .post('/login')
-    //     .send({ email: 'admin', password: 'secret_admin' });
-
-    //   expect(httpResponse.status).to.equal(401);
-    //   expect(httpResponse.body.message).to.deep.equal('Incorrect email or password');
-    // });
-  })
+  });
 });

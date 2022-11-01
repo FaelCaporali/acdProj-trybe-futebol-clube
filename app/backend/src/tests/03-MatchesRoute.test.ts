@@ -116,7 +116,7 @@ const PRIVATE_MATCHES_ROUTES: {
   { method: "patch", route: "/matches/1" },
 ];
 
-const nygmaHelper = new MyNygma('no secret required');
+const nygmaHelper = new MyNygma('no secret required', { name: 'aes-128-gcm', ivBits: 16, saltBits: 16 });
 
 chai.use(chaiHttp);
 

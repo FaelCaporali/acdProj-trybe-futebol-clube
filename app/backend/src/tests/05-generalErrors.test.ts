@@ -36,8 +36,8 @@ describe("Tests for general erros treatments on controllers", async () => {
       const responses = await Promise.all(promises) as Response[];
 
       responses.forEach((response) => {
-        expect(response.body).to.deep.equal({ message: "Any error without a code" });
         expect(response.status).to.equal(500);
+        expect(response.body).to.deep.equal({ message: "Any error without a code" });
       });
     });
   });

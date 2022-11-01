@@ -1,3 +1,4 @@
+import { HttpException } from 'src/shared/error/HttpException';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 import * as sinon from 'sinon';
@@ -18,8 +19,9 @@ INVALID_MIN_LENGTH_PASSWORD,
 NON_REGISTERED_USER,
 BAD_CREDENTIALS,
 } from './mocks/Users.mocks';
+import { GOOD_TOKEN, USER } from './mocks/responses';
 import { AUTH_ERRORS } from './mocks/Errors.mocks';
-import AuthServices from '../shared/auth/service';
+import { request } from 'chai';
 
 chai.use(chaiHttp);
 
@@ -29,7 +31,7 @@ describe('TESTS FOR /login ROUTES', () => {
   
   describe('(POST)/login - for a good request received:', async () => {
   
-    sinon.stub(Model, 'findOne').resolves(FAKE_USER as User);
+    sinon.stub(Model, 'findOne').resolves(USER as User);
 
     
     const httpResponse = await chai
@@ -55,9 +57,9 @@ describe('TESTS FOR /login ROUTES', () => {
       const modelSpy = sinon.spy(Model.findOne);
       
       it(`Should require an email field on the request body. If not found:
-      1. Should return an 400 status;
-      2. should return the right error message;
-      3. Should not try to access the DataBase`, async () => {
+      - Should return an 400 status;
+      - should return the right error message;
+      - Should not try to access the DataBase`, async () => {
         const httpResponse = await chai
           .request(app)
           .post('/login')
@@ -69,9 +71,9 @@ describe('TESTS FOR /login ROUTES', () => {
       });
 
       it(`Should require an non empty valid email string as the email field value. If not provided:
-      1. Should return an 401 status;
-      2. Should return the right error message;
-      3. Should not try to access the DataBase`, async () => {
+      - Should return an 401 status;
+      - Should return the right error message;
+      - Should not try to access the DataBase`, async () => {
         const httpResponse = await chai
           .request(app)
           .post('/login')
@@ -83,9 +85,9 @@ describe('TESTS FOR /login ROUTES', () => {
       });
 
       it(`Should require password field on the request body, if not provided:
-      1. Should return an 400 status.
-      2. Should return the right error message.
-      3. Should not try to access the DataBase`, async () => {
+      - Should return an 400 status.
+      - Should return the right error message.
+      - Should not try to access the DataBase`, async () => {
         const httpResponse = await chai
           .request(app)
           .post('/login')
@@ -97,9 +99,9 @@ describe('TESTS FOR /login ROUTES', () => {
       });
   
       it(`Should require an 6 characters minimum length string as the password field value, if not provided:
-      1. Should return an 401 status;
-      2. Should return the right error message;
-      3. Should not try to access the DataBase`, async () => {
+      - Should return an 401 status;
+      - Should return the right error message;
+      - Should not try to access the DataBase`, async () => {
         const httpResponse = await chai
           .request(app)
           .post('/login')
@@ -118,13 +120,13 @@ describe('TESTS FOR /login ROUTES', () => {
 
     describe('For bad credentials', () => {
       before(() => {
-        sinon.stub(Model, 'findOne').resolves(FAKE_USER as User);
+        sinon.stub(Model, 'findOne').resolves(USER as User);
       })
       after(() => sinon.restore());
 
       it(`For an unregistered user:
-      1. Should return an 401 status;
-      2. Should return the right message on the response body;`, async () => {
+      - Should return an 401 status;
+      - Should return the right message on the response body;`, async () => {
         const httpResponse = await chai
           .request(app)
           .post('/login')
@@ -146,10 +148,28 @@ describe('TESTS FOR /login ROUTES', () => {
     });
   });
 
+  describe('(POST)/login/register', () => {
+    before(() => {
+      sinon.stub(User, 'create').resolves(USER as User);
+      sinon.stub(User, 'findOne').resolves(USER  as User);
+      sinon.stub(User, 'findByPk').resolves(USER as User);
+    })
+    after(() => sinon.restore());
+
+    it('Should gracefully register an user, responding with a log token and a 201 status', async () => {
+      const httpResponse = await request(app).post('/login/register').send(FAKE_USER);
+
+      expect(httpResponse.status).to.equal(201);
+      expect(Object.keys(httpResponse.body)).to.deep.equal(['token']);
+      expect(typeof httpResponse.body.token).to.deep.equal('string');
+
+    })
+  });
+
   describe('(GET) /login/validate services', () => {
     before(() => {
-      sinon.stub(Model, 'findOne').resolves(FAKE_USER as User);
-      sinon.stub(Model, 'findByPk').resolves(FAKE_USER as User);
+      sinon.stub(Model, 'findOne').resolves(USER as User);
+      sinon.stub(Model, 'findByPk').resolves(USER as User);
     });
     after(() => sinon.restore());
 

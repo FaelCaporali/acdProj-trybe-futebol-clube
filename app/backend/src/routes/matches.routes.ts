@@ -6,6 +6,7 @@ const match = Router();
 const matchCtl = new MatchCtl();
 
 match.get('/', (req, res, next) => matchCtl.getMatches(req, res, next));
+match.get('/:id', (req, res, next) => matchCtl.findMatch(req, res, next));
 
 match.use((rq, rs, nxt) => auth.middleware(rq, rs, nxt));
 

@@ -31,6 +31,12 @@ export default class MatchServices implements IMatchService {
     }) as Match[];
   }
 
+  async findMatch(id: number): Promise<Match> {
+    const match = await this.model.findByPk(id);
+    if (!match) throw new HttpException(404, 'Match not found');
+    return match;
+  }
+
   async postMatchHandler(match: IMatchSchedule): Promise<IDBMatch | undefined> {
     const homeTeam = await this.model.findByPk(match.homeTeam);
     const awayTeam = await this.model.findByPk(match.awayTeam);

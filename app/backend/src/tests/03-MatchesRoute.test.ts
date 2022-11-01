@@ -58,7 +58,7 @@ describe("/matches services:", () => {
       const httpResponse = await chai.request(app).get("/matches/1");
 
       expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body.message).to.deep.equal(ALL_MATCHES[0]);
+      expect(httpResponse.body).to.deep.equal({ ...ALL_MATCHES[0] });
     });
   });
 

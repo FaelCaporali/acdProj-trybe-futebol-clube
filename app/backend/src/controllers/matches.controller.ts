@@ -34,6 +34,19 @@ export default class MatchCtl {
     }
   }
 
+  async findMatch(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> {
+    try {
+      const match = await this.services.findMatch(Number(req.params.id));
+      return res.status(200).json(match);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async getMatches(
     req: Request,
     res: Response,

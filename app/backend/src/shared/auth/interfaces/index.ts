@@ -27,6 +27,6 @@ export interface IFullUser extends INewUser {
 
 export interface IAuthServices {
   register(user: INewUser): Promise<IUser>;
-  validate(token: IToken): Promise<IRole>;
+  validate(token: IToken): IRole;
   login(user: ILogRequest): Promise<IToken>;
 }

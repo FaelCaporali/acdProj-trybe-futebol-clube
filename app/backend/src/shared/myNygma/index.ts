@@ -50,7 +50,6 @@ export default class MyNygma implements INygma {
       const { role } = this.deHashUser(payload);
       return { role } as IRole;
     } catch (e) {
-      console.error(e);
       throw new HttpException(401, 'Token must be a valid token');
     }
   }

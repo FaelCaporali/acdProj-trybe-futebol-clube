@@ -36,13 +36,11 @@ export default class MatchServices implements IMatchService {
     const awayTeam = await this.model.findByPk(match.awayTeam);
     if (!homeTeam || !awayTeam) throw new HttpException(404, 'There is no team with such id!');
 
-    // Preferi validar a duplicidade de times aqui para evitar erros.
-    // Mesmo com algum erro de inferência de tipo ou algum tipo de injection, achando os dois times no banco de dados e confirmando que são diferentes me parece mais seguro.
     if (homeTeam.id === awayTeam.id) {
       throw new HttpException(422, 'It is not possible to create a match with two equal teams');
     }
 
-    if (match.inProgress) {
+    if (match.inProgress === 'false') {
       const newMatch = await this.scheduleMatch(match);
       return newMatch;
     }
@@ -62,6 +60,7 @@ export default class MatchServices implements IMatchService {
     const match = await this.model.findByPk(id);
     const update = await this.model.update({ ...match, inProgress: false }, { where: { id } });
     if (update[0] === 1) return { message: 'Finished' };
+    throw new HttpException(500, 'Internal server error');
   }
 
   async score(scoreToSet: IScore, id: string): Promise<IDBMatch | undefined> {

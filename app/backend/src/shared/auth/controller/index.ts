@@ -8,14 +8,14 @@ class AuthCtl {
     this.services = new AuthServices();
   }
 
-  public async middleware(
+  public middleware(
     req: Request,
     _res: Response,
     next: NextFunction,
-  ): Promise<void> {
+  ): void {
     try {
       const { headers: { authorization } } = req;
-      const { role } = await this.services.validate({ token: authorization } as IToken);
+      const { role } = this.services.validate({ token: authorization } as IToken);
       req.headers.role = role;
       return next();
     } catch (e) {

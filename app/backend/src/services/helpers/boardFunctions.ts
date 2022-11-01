@@ -1,8 +1,13 @@
+/* eslint-disable max-lines-per-function */
 import { IScoreBoard } from '../interfaces/Boards.interfaces';
 import { IDBMatch } from '../interfaces/Match.interfaces';
 import { ITeam } from '../interfaces/Team.interfaces';
 
-function getPoints(type: 'homeTeam' | 'awayTeam', matches: IDBMatch[], team: ITeam): number {
+function getPoints(
+  type: 'homeTeam' | 'awayTeam',
+  matches: IDBMatch[],
+  team: ITeam,
+): number {
   const goals = type === 'homeTeam' ? 'homeTeamGoals' : 'awayTeamGoals';
   const sufferedGoals = type === 'homeTeam' ? 'awayTeamGoals' : 'homeTeamGoals';
   const finalPoints = matches.reduce((points: number, match: IDBMatch) => {
@@ -52,7 +57,11 @@ function getGoals(
   return { goalsPro, goalsCounter };
 }
 
-function board(type: 'homeTeam' | 'awayTeam', matches: IDBMatch[], teams: ITeam[]): IScoreBoard[] {
+function board(
+  type: 'homeTeam' | 'awayTeam',
+  matches: IDBMatch[],
+  teams: ITeam[],
+): IScoreBoard[] {
   return teams.reduce((final: IScoreBoard[], team) => {
     const { victories, draws, losses } = getResults(type, matches, team);
     const { goalsPro, goalsCounter } = getGoals(type, matches, team);
@@ -68,14 +77,19 @@ function board(type: 'homeTeam' | 'awayTeam', matches: IDBMatch[], teams: ITeam[
       goalsBalance: goalsPro - goalsCounter,
       efficiency: '',
     };
-    modified.efficiency = ((modified.totalPoints / (modified.totalGames * 3)) * 100).toFixed(2);
+    modified.efficiency = (
+      (modified.totalPoints / (modified.totalGames * 3))
+      * 100
+    ).toFixed(2);
     return [...final, modified];
   }, []);
 }
 
 function fullBoard(home: IScoreBoard[], away: IScoreBoard[]) {
   return home.reduce((finalBoard: IScoreBoard[], homeBoard) => {
-    const resultsAway = away.find((team) => team.name === homeBoard.name) as IScoreBoard;
+    const resultsAway = away.find(
+      (team) => team.name === homeBoard.name,
+    ) as IScoreBoard;
     const fullR: IScoreBoard = {
       name: homeBoard.name,
       totalPoints: homeBoard.totalPoints + resultsAway.totalPoints,
@@ -89,28 +103,39 @@ function fullBoard(home: IScoreBoard[], away: IScoreBoard[]) {
       efficiency: '',
     };
     fullR.goalsBalance = fullR.goalsFavor - fullR.goalsOwn;
-    fullR.efficiency = ((fullR.totalPoints / (fullR.totalGames * 3)) * 100).toFixed(2);
+    fullR.efficiency = (
+      (fullR.totalPoints / (fullR.totalGames * 3))
+      * 100
+    ).toFixed(2);
     return [...finalBoard, fullR];
   }, []);
 }
 
 function sortBoard(results: IScoreBoard[]): IScoreBoard[] {
   return results
-    .sort((team1, team2) => team2.totalPoints - team1.totalPoints).sort((team1, team2) => {
-      if (team2.totalPoints === team1.totalPoints) return team2.goalsBalance - team1.goalsBalance;
+    .sort((team1, team2) => team2.totalPoints - team1.totalPoints)
+    .sort((team1, team2) => {
+      // eslint-disable-next-line max-len
+      if (team2.totalPoints === team1.totalPoints) return team2.totalVictories - team1.totalVictories;
       return 0;
-    }).sort((team1, team2) => {
+    })
+    .sort((team1, team2) => {
       if (
         team2.totalPoints === team1.totalPoints
-        && team1.goalsBalance === team2.goalsBalance
-      ) return team2.goalsFavor - team1.goalsFavor;
+        && team1.totalVictories === team2.totalVictories
+      ) {
+        return team2.goalsBalance - team1.goalsBalance;
+      }
       return 0;
-    }).sort((team1, team2) => {
+    })
+    .sort((team1, team2) => {
       if (
         team2.totalPoints === team1.totalPoints
+        && team1.totalVictories === team2.totalVictories
         && team1.goalsBalance === team2.goalsBalance
-        && team1.goalsFavor === team2.goalsFavor
-      ) return team1.goalsOwn - team2.goalsOwn;
+      ) {
+        return team2.goalsFavor - team1.goalsFavor;
+      }
       return 0;
     });
 }

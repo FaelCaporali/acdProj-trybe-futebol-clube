@@ -27,12 +27,12 @@ export default class AuthServices implements IAuthServices {
     this.schemas = schema;
   }
 
-  async register(user: INewUser): Promise<IUser> {
-    const newUser = await this.model.create(user);
-    return newUser as IUser;
+  // eslint-disable-next-line class-methods-use-this
+  async register(_user: INewUser): Promise<IUser> {
+    throw new HttpException(422, 'not implemented yet');
   }
 
-  public async validate(token: IToken): Promise<IRole> {
+  public validate(token: IToken): IRole {
     if (!token.token) throw new HttpException(400, 'Must provide credentials');
     const userRole = this.nygma.validateToken(token);
     return userRole;

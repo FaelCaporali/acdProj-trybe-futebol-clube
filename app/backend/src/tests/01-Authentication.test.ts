@@ -1,4 +1,3 @@
-import { HttpException } from 'src/shared/error/HttpException';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 import * as sinon from 'sinon';
@@ -162,8 +161,7 @@ describe('TESTS FOR /login ROUTES', () => {
       expect(httpResponse.status).to.equal(201);
       expect(Object.keys(httpResponse.body)).to.deep.equal(['token']);
       expect(typeof httpResponse.body.token).to.deep.equal('string');
-
-    })
+    });
   });
 
   describe('(GET) /login/validate services', () => {

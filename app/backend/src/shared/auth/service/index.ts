@@ -53,10 +53,4 @@ export default class AuthServices implements IAuthServices {
 
     return this.nygma.generateToken(validUser as IUser);
   }
-
-  public async logout(_id: number): Promise<void> {
-    const user = await this.model.findByPk(1);
-    console.log(user);
-    throw new Error('Method not implemented yet.');
-  }
 }

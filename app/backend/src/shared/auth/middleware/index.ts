@@ -19,4 +19,14 @@ export default class AuthMiddleware {
     }
     return next();
   }
+
+  registerRequest(req: Request, res: Response, next: NextFunction): void {
+    if (
+      !req.body
+      || !req.body.email
+      || !req.body.password
+      || !req.body.username
+    ) return next(this.invalidOrMissingField);
+    return next();
+  }
 }

@@ -16,4 +16,10 @@ auth.get(
   (req, res, next) => authCtl.authenticate(req, res, next),
 );
 
+auth.post(
+  '/register',
+  (req, res, next) => mid.registerRequest(req, res, next),
+  (req, res, next) => authCtl.register(req, res, next),
+);
+
 export default auth;

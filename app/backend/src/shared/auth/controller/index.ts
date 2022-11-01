@@ -52,6 +52,19 @@ class AuthCtl {
       next(e);
     }
   }
+
+  public async register(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | void> {
+    try {
+      const token = await this.services.register(req.body);
+      return res.status(201).json(token);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 const auth = new AuthCtl();

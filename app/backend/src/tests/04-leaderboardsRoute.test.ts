@@ -32,9 +32,9 @@ describe("Nas Rotas /leaderboards", () => {
     expect(response.status).to.equal(200);
     expect(response.body).to.deep.equal(AWAY_TEAM_SCORES);
   });
-});
-it("/ -> tendo os dados do banco fornecidos como na DB inicial, testa o resultado da classificação", async () => {
-  const response = await chai.request(app).get("/leaderboard");
-  expect(response.status).to.equal(200);
-  expect(response.body).to.deep.equal(FULL_SCORE);
+  it("/ -> tendo os dados do banco fornecidos como na DB inicial, testa o resultado da classificação", async () => {
+    const response = await chai.request(app).get("/leaderboard");
+    expect(response.status).to.equal(200);
+    expect(response.body).to.deep.equal(FULL_SCORE);
+  });
 });

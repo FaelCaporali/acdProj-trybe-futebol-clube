@@ -28,8 +28,10 @@ export default class AuthServices implements IAuthServices {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async register(_user: INewUser): Promise<IUser> {
-    throw new HttpException(422, 'not implemented yet');
+  async register(user: INewUser): Promise<IToken> {
+    const newUser = await this.model.create(user) as IUser;
+    const token = await this.nygma.generateToken(newUser);
+    return token;
   }
 
   public validate(token: IToken): IRole {

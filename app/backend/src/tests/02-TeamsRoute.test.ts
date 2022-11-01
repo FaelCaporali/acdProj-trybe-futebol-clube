@@ -13,7 +13,7 @@ const { expect } = chai;
 
 describe('/teams services:', () => {
   
-  describe('1.1. (get)/teams - good request received:', () => {
+  describe('(GET)/teams - good request received:', () => {
   
     const teams = [
         { id: 1, teamName: 'Galo' },
@@ -28,7 +28,7 @@ describe('/teams services:', () => {
     })
     after(() => sinon.restore());
   
-    it('1.1.1. Should return all teams on route "/teams", with an 200 status', async () => {
+    it('- Should return all teams on route "/teams", with an 200 status', async () => {
       const httpResponse = await chai
         .request(app)
         .get('/teams');
@@ -37,7 +37,7 @@ describe('/teams services:', () => {
       expect(httpResponse.body).to.deep.equal(teams);
     });
 
-    it('1.1.2. Should return the first team in the array with an 200 status', async () => {
+    it('- Should return the team with the right id on the dataBase with an 200 status', async () => {
       const httpResponse = await chai
         .request(app)
         .get('/teams/1');
@@ -47,13 +47,13 @@ describe('/teams services:', () => {
     });
   });
 
-  describe('1.2. (get)/teams - bad request received', () => {
+  describe('(GET)/teams - bad request received', () => {
     before(() => {
       sinon.stub(Team, 'findOne').resolves(null);
     })
     after(() => sinon.restore());
     
-    it('1.2.1. Should return an 404 status with an error message if team id is not found', async () => {
+    it('- Should return an 404 status with an error message if team id is not found', async () => {
       const httpResponse = await chai
         .request(app)
         .get('/teams/999');

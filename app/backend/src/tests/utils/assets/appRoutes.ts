@@ -22,10 +22,10 @@ export const PUBLIC_ROUTES: {
     method: "get",
     route: "/matches",
   },
-  // {
-  //     method: 'get',
-  //     route: '/matches/1',
-  // },
+  {
+      method: 'get',
+      route: '/matches/1',
+  },
   {
     method: "get",
     route: "/leaderboard",
@@ -38,10 +38,10 @@ export const PUBLIC_ROUTES: {
     method: "get",
     route: "/leaderboard/away",
   },
-  // {
-  //   method: "post",
-  //   route: "/login/register",
-  // },
+  {
+    method: "post",
+    route: "/login/register",
+  },
 ];
 
 export const PRIVATE_ROUTES: {

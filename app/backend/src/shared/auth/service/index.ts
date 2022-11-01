@@ -21,16 +21,16 @@ export default class AuthServices implements IAuthServices {
   constructor() {
     this.model = User;
     this.nygma = new MyNygma(
+      // @istanbull-ignore
       process.env.JWT_SECRET || 'Should have a better secret',
       { name: 'aes-128-gcm', ivBits: 16, saltBits: 16 },
     );
     this.schemas = schema;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async register(user: INewUser): Promise<IToken> {
     const newUser = await this.model.create(user) as IUser;
-    const token = await this.nygma.generateToken(newUser);
+    const token = this.nygma.generateToken(newUser);
     return token;
   }
 

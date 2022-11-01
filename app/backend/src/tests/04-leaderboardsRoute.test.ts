@@ -14,7 +14,7 @@ import {
 
 chai.use(chaiHttp);
 
-describe("Nas Rotas /leaderboards", () => {
+describe("(GET)/leaderboards", () => {
   beforeEach(() => {
     sinon.stub(Match, "findAll").resolves(ALL_MATCHES as Match[]);
     sinon.stub(Team, "findAll").resolves(ALL_TEAMS as Team[]);
@@ -22,17 +22,17 @@ describe("Nas Rotas /leaderboards", () => {
   afterEach(() => {
     sinon.restore();
   });
-  it("/home -> tendo os dados do banco fornecidos como na DB inicial, testa o resultado da classificação", async () => {
+  it("/leaderboard/home -> should return the right classification for data for home games", async () => {
     const response = await chai.request(app).get("/leaderboard/home");
     expect(response.status).to.equal(200);
     expect(response.body).to.deep.equal(HOME_TEAMS_SCORES);
   });
-  it("/away -> tendo os dados do banco fornecidos como na DB inicial, testa o resultado da classificação", async () => {
+  it("/leaderboard/away -> should return the right classification for data for away games", async () => {
     const response = await chai.request(app).get("/leaderboard/away");
     expect(response.status).to.equal(200);
     expect(response.body).to.deep.equal(AWAY_TEAM_SCORES);
   });
-  it("/ -> tendo os dados do banco fornecidos como na DB inicial, testa o resultado da classificação", async () => {
+  it("/leaderboard -> should return the right classification for data for all games", async () => {
     const response = await chai.request(app).get("/leaderboard");
     expect(response.status).to.equal(200);
     expect(response.body).to.deep.equal(FULL_SCORE);

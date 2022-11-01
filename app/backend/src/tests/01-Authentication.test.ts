@@ -155,12 +155,19 @@ describe('TESTS FOR /login ROUTES', () => {
     })
     after(() => sinon.restore());
 
-    it('Should gracefully register an user, responding with a log token and a 201 status', async () => {
+    it('- Should gracefully register an user, responding with a log token and a 201 status', async () => {
       const httpResponse = await request(app).post('/login/register').send(FAKE_USER);
 
       expect(httpResponse.status).to.equal(201);
       expect(Object.keys(httpResponse.body)).to.deep.equal(['token']);
       expect(typeof httpResponse.body.token).to.deep.equal('string');
+    });
+
+    it('- Should require all the fields on the body request, if not, should return an 400 status with missing field message', async () => {
+      const httpResponse = await request(app).post('/login/register').send({ email: 'there@are.com', password: 'missing fields'})
+    
+      expect(httpResponse.status).to.equal(400);
+      expect(httpResponse.body.message).to.equal(AUTH_ERRORS.messages.missingField)
     });
   });
 
@@ -172,7 +179,7 @@ describe('TESTS FOR /login ROUTES', () => {
     after(() => sinon.restore());
 
 
-    it('Should return the right user role if a valid token is provided on header "authorization" field', async () => {
+    it('- Should return the right user role if a valid token is provided on header "authorization" field', async () => {
       const { body: { token } } = await chai
         .request(app)
         .post('/login')
@@ -181,14 +188,14 @@ describe('TESTS FOR /login ROUTES', () => {
       expect(httpResponse.body).to.deep.equal({ role: FAKE_USER.role });
     });
 
-    it('Should return a status 401 and "Token must be a valid token" as a message value in body response, if token is invalid',
+    it('- Should return a status 401 and "Token must be a valid token" as a message value in body response, if token is invalid',
     async () => {
       const httpResponse = await chai.request(app).get('/login/validate').set('authorization', 'non-valid-token');
       expect(httpResponse.status).to.equal(401);
       expect(httpResponse.body.message).to.equal(AUTH_ERRORS.messages.invalidToken);
     });
 
-    it('Should return a status 400 and "Must provide credentials" as a message value, in body response, if token is not provided. \n It should not try to access the DataBase',
+    it('- Should return a status 400 and "Must provide credentials" as a message value, in body response, if token is not provided. \n It should not try to access the DataBase',
     async () => {
       sinon.restore();
       const testSpy = sinon.spy(Model, 'findOne');

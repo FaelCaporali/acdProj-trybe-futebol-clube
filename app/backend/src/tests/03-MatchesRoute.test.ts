@@ -34,13 +34,13 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe("/matches services:", () => {
-  describe("(get)/matches:", () => {
+  describe("(GET)/matches:", () => {
     before(() => {
       sinon.stub(Match, "findAll").resolves(ALL_MATCHES as Match[]);
     });
     after(() => sinon.restore());
 
-    it('Should return all matches with teams names joined on route "/matches", with an 200 status', async () => {
+    it('- Should return all matches with teams names joined on route "/matches", with an 200 status', async () => {
       const httpResponse = await chai.request(app).get("/matches");
 
       expect(httpResponse.status).to.equal(200);
@@ -48,13 +48,13 @@ describe("/matches services:", () => {
     });
   });
 
-  describe("(get)/matches/:id - good request received", () => {
+  describe("(GET)/matches/:id - good request received", () => {
     before(() => {
       sinon.stub(Match, "findOne").resolves(ALL_MATCHES[0] as Match);
     });
     after(() => sinon.restore());
 
-    it("Should return an 200 status with the right object representing a match, on route /matches/:id", async () => {
+    it("- Should return an 200 status with the right object representing a match, on route /matches/:id", async () => {
       const httpResponse = await chai.request(app).get("/matches/1");
 
       expect(httpResponse.status).to.equal(200);
@@ -62,13 +62,13 @@ describe("/matches services:", () => {
     });
   });
 
-  describe("(get)/matches/:id - invalid id", () => {
+  describe("(GET)/matches/:id - invalid id", () => {
     before(() => {
       sinon.stub(Match, "findOne").resolves(undefined);
     });
     after(() => sinon.restore());
 
-    it("Should return an 404 status and 'Match not found' message for an invalid id, on route get /matches/:id", async () => {
+    it("- Should return an 404 status and 'Match not found' message for an invalid id, on route get /matches/:id", async () => {
       const httpResponse = await chai.request(app).get("/matches/980");
 
       expect(httpResponse.status).to.equal(404);
@@ -76,7 +76,7 @@ describe("/matches services:", () => {
     });
   });
 
-  describe("(get)/matches/query", () => {
+  describe("(GET)/matches/query", () => {
     before(() => {
       sinon
         .stub(Match, "findAll")
@@ -85,7 +85,7 @@ describe("/matches services:", () => {
     });
     after(() => sinon.restore());
 
-    it("Resolves with actives matches", async () => {
+    it("- Should Resolves with actives matches on /matches?inProgress=true", async () => {
       const httpResponse = await chai
         .request(app)
         .get("/matches?inProgress=true");
@@ -94,7 +94,7 @@ describe("/matches services:", () => {
       expect(httpResponse.body).to.deep.equal([ALL_MATCHES[0]]);
     });
 
-    it("Resolves with inatives matches", async () => {
+    it("Resolves with inatives matches on /matches?inProgress=false", async () => {
       const httpResponse = await chai
         .request(app)
         .get("/matches?inProgress=false");
@@ -104,7 +104,7 @@ describe("/matches services:", () => {
     });
   });
 
-  describe("(post)/matches", () => {
+  describe("(POST)/matches", () => {
     before(() => {
       sinon.stub(Match, "create").resolves(NEW_MATCH_RESPONSE as Model);
       sinon.stub(Team, "findByPk").resolves(NEW_MATCH_RESPONSE as Team);
@@ -112,7 +112,7 @@ describe("/matches services:", () => {
     });
     after(() => sinon.restore());
 
-    it("Should deny request a registry a match with same team as home and away team ", async () => {
+    it("- Should deny request to registry a match with same team as home and away team with 422 status", async () => {
       const response = await chai
         .request(app)
         .post("/matches")
@@ -123,7 +123,7 @@ describe("/matches services:", () => {
       expect(response.body.message).to.equal(MATCHES_ERRORS.messages.doubledTeamError);
     });
 
-    it("Should deny registry a match with a team not registered", async () => {
+    it("- Should deny registry a match with a team not registered on the dataBase with 404 status", async () => {
       const response = await chai
         .request(app)
         .post("/matches")
@@ -134,7 +134,7 @@ describe("/matches services:", () => {
       expect(response.body.message).to.equal(MATCHES_ERRORS.messages.notFoundTeam);
     });
 
-    it("Should gracefully post a match with all the above requirements fulfilled", async () => {
+    it("- Should gracefully post a match with all the above requirements fulfilled, returning it with an 201 status", async () => {
       const response = await chai
         .request(app)
         .post("/matches")
@@ -145,7 +145,7 @@ describe("/matches services:", () => {
       expect(response.body).to.deep.equal(NEW_MATCH_RESPONSE);
     });
 
-    it("Should gracefully schedule a match with all the above requirements fulfilled", async () => {
+    it("- Should gracefully schedule a match with all the above requirements fulfilled, returning it with an 201 status", async () => {
       const response = await chai
         .request(app)
         .post("/matches")
@@ -157,7 +157,7 @@ describe("/matches services:", () => {
     });
   });
 
-  describe("(patch)/matches/:id", () => {
+  describe("(PATCH)/matches/:id", () => {
     before(() => {
       sinon.stub(Match, "update").resolves([1, []]);
       sinon.stub(Match, "findByPk").resolves(NEW_MATCH_RESPONSE as Model);
@@ -169,7 +169,7 @@ describe("/matches services:", () => {
     });
     after(() => sinon.restore());
 
-    it("Gracefully score a goal, testing token services", async () => {
+    it("- Should gracefully score a goal, with the right token sent", async () => {
       const {
         body: { token },
       } = await chai.request(app).post("/login").send(GOOD_CREDENTIALS);
@@ -183,7 +183,7 @@ describe("/matches services:", () => {
       expect(response.body).to.deep.equal(NEW_MATCH_RESPONSE);
     });
 
-    it("Gracefully blows the finish whistle, testing token services", async () => {
+    it("- Should gracefully blows the finish whistle, with the right token sent", async () => {
       const {
         body: { token },
       } = await chai.request(app).post("/login").send(GOOD_CREDENTIALS);
@@ -197,19 +197,17 @@ describe("/matches services:", () => {
     });
   });
 
-  describe("(patch)/matches/:id", () => {
+  describe("(PATCH)/matches/:id", () => {
     before(() => {
       sinon
         .stub(Match, "findByPk")
-        .onFirstCall()
-        .resolves(ALL_MATCHES[1] as Match)
-        .onSecondCall()
-        .resolves(null);
+        .onFirstCall().resolves(ALL_MATCHES[1] as Match)
+        .onSecondCall().resolves(null);
       sinon.stub(auth, "middleware").callsFake(middlewareSkipper);
     });
     after(() => sinon.restore());
 
-    it("Should not update a match in Progress", async () => {
+    it("- Should not update a match not in Progress", async () => {
       const response = await chai
         .request(app)
         .patch("/matches/1")
@@ -222,7 +220,7 @@ describe("/matches services:", () => {
       );
     });
 
-    it("Test for an error finding the match, at the match update", async () => {
+    it("- Test for an error finding the match, at the match update", async () => {
       const response = await chai
         .request(app)
         .patch("/matches/1")

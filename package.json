@@ -8,10 +8,10 @@
     "install:apps": "./apps_install.sh",
     "pretest": "(cd ./app/backend && /bin/sh tsc_eval.sh)",
     "test": "cd ./app/backend && npm run test",
-    "test:coverage": "cd ./app/backend && nyc npm test",
-    "compose:up:dev": "(cd app && docker compose -f docker-compose.dev.yml up -d --build)",
-    "compose:down:dev": "(cd app && docker-compose -f docker-compose.dev.yml down --remove-orphans)",
-    "logs": "cd app && docker-compose logs -f"
+    "test-coverage": "cd ./app/backend && nyc npm test",
+    "compose-up-dev": "(cd app && docker compose -f docker-compose.dev.yml up -d --build)",
+    "compose-down-dev": "(cd app && docker compose -f docker-compose.dev.yml down --remove-orphans)",
+    "logs": "cd app && docker compose logs -f"
   },
   "author": "Trybe",
   "devDependencies": {
